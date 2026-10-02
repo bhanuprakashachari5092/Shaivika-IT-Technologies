@@ -1,2 +1,8 @@
 # Local Netlify folder
 .netlify
+
+# Animoria cache & staged cleanup
+.animoria/
+.ai-session/
+scratch/
+audit_output*.txt

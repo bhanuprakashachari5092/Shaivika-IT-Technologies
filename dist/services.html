@@ -7,890 +7,479 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <script>
-    (function() {
-      const theme = localStorage.getItem('theme') || 'light';
-      if (theme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
+    (function () {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
     })();
   </script>
-  <title>IT, AI & Software Development Services | Shaivika IT Technologies</title>
-  <meta name="description" content="Shaivika IT Technologies offers AI solutions, custom software development, web & mobile app development, SaaS, and digital transformation services for businesses globally." />
-  <meta name="keywords" content="IT services, AI development, custom software development, web development company, SaaS development, business automation" />
-  <meta name="author" content="Shaivika IT Technologies">
-  <meta name="robots" content="index, follow">
-  
-  <link rel="canonical" href="https://shaivikaittechnologies.in/services.html" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="IT, AI & Software Development Services | Shaivika IT Technologies">
-  <meta property="og:description" content="Shaivika IT Technologies offers AI solutions, custom software development, web & mobile app development, SaaS, and digital transformation services for businesses globally.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://shaivikaittechnologies.in/services.html">
-  <meta property="og:image" content="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_600/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png">
-  <meta property="og:site_name" content="Shaivika IT Technologies">
   
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="IT, AI & Software Development Services | Shaivika IT Technologies">
-  <meta name="twitter:description" content="Shaivika IT Technologies offers AI solutions, custom software development, web & mobile app development, SaaS, and digital transformation services for businesses globally.">
-  <meta name="twitter:image" content="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_600/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png">
+  <title>Solutions &amp; Services | SHAIVIKA IT TECHNOLOGIES</title>
+  <meta name="description"
+    content="Explore our core technology solutions: AI Solutions, SaaS Product Development, Web Applications, E-Commerce, Business Automation, and Data Analytics engineered for businesses worldwide." />
+  <link rel="canonical" href="https://shaivikaittechnologies.in/solutions.html" />
 
-  <!-- JSON-LD Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Service",
-        "serviceType": "Software Development & AI Automation",
-        "provider": {
-          "@id": "https://shaivikaittechnologies.in/#organization"
-        },
-        "areaServed": ["India", "Global"],
-        "hasOfferCatalog": {
-          "@type": "OfferCatalog",
-          "name": "IT Services",
-          "itemListElement": [
-            {
-              "@type": "Offer",
-              "itemOffered": {
-                "@type": "Service",
-                "name": "Custom Software Development"
-              }
-            },
-            {
-              "@type": "Offer",
-              "itemOffered": {
-                "@type": "Service",
-                "name": "AI Solutions & Automation"
-              }
-            },
-            {
-              "@type": "Offer",
-              "itemOffered": {
-                "@type": "Service",
-                "name": "Web & Mobile App Development"
-              }
-            }
-          ]
-        }
-      },
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://shaivikaittechnologies.in/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Services",
-            "item": "https://shaivikaittechnologies.in/services.html"
-          }
-        ]
-      }
-    ]
-  }
-  </script>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_600/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" />
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_600/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" />
+  <link rel="icon" type="image/webp" href="img/favicon.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/style.min.css?v=9" />
-    <style>
-        .services-content {
-            padding-top: 40px;
-        }
-
-        .services-section-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .services-section-desc {
-            font-size: 15px;
-            color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 36px;
-        }
-
-        .services-panel {
-            display: none;
-        }
-
-        .services-panel.active {
-            display: block;
-        }
-
-        .service-list-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .service-list-item {
-            padding: 28px;
-            border-radius: 16px;
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            transition: all var(--transition-smooth);
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-        }
-
-        .service-list-item:hover {
-            border-color: var(--border-glow);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-glow);
-        }
-
-        .sli-icon {
-            font-size: 28px;
-            flex-shrink: 0;
-        }
-
-        .sli-title {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .sli-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .saas-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .saas-card {
-            padding: 28px;
-            border-radius: 16px;
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            transition: all var(--transition-smooth);
-        }
-
-        .saas-card:hover {
-            border-color: var(--border-glow);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-glow);
-        }
-
-        .saas-title {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .saas-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            margin-bottom: 14px;
-        }
-
-        .course-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .course-card {
-            padding: 28px;
-            border-radius: 16px;
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            text-align: center;
-            transition: all var(--transition-smooth);
-        }
-
-        .course-card:hover {
-            border-color: var(--border-glow);
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-glow);
-        }
-
-        .course-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .course-title {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .course-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .ai-sub-list {
-            list-style: none;
-            margin-top: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .ai-sub-list li {
-            font-size: 13px;
-            color: var(--text-secondary);
-            padding: 6px 12px;
-            background: rgba(0, 102, 255, 0.06);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .ai-sub-list li::before {
-            content: '→';
-            color: var(--neon-blue);
-            font-weight: 700;
-        }
-
-        @media(max-width:900px) {
-
-            .service-list-grid,
-            .saas-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .course-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media(max-width:600px) {
-            .course-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .services-section-title {
-                font-size: 1.4rem;
-            }
-        }
-    </style>
-  </head>
+  <link rel="stylesheet" href="css/style.min.css?v=2026" />
+  <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js" type="module"></script>
+</head>
 
 <body>
-  <!-- GLOBAL PRELOADER / OFFLINE SCREEN -->
-  <div id="global-preloader" class="preloader-hidden">
-    <div class="preloader-content" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; max-width: 400px; width: 100%;">
-      <!-- Offline Icon (Feather/Lucide style) -->
-      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px; color: var(--neon-purple, #6366f1);">
-        <path d="M12 21v.01" />
-        <path d="M19.386 15.386a9 9 0 0 0-12.772 0" />
-        <path d="M22.062 12.693a13 13 0 0 0-18.124 0" />
-        <path d="M24.739 10.001a17 17 0 0 0-23.478 0" />
-        <path d="m2 2 20 20" />
-      </svg>
-      <h2 style="font-family: var(--font-display, 'Orbitron', sans-serif); font-size: 24px; font-weight: 700; color: var(--text-primary, #f8fafc); margin-bottom: 12px; letter-spacing: 1px;">CONNECTION LOST</h2>
-      <p style="font-family: var(--font-primary, 'Inter', sans-serif); font-size: 15px; color: var(--text-secondary, #94a3b8); line-height: 1.6; margin-bottom: 24px;">Please check your internet connection. This page will automatically reconnect once your online status is restored.</p>
-      <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted, #475569); font-size: 13px; font-family: var(--font-primary), sans-serif;">
-        <span class="pulse-dot" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #6366f1; animation: pulse 1.5s infinite;"></span>
-        Attempting to reconnect...
+    <!-- GLOBAL PRELOADER / SHAIVIKA LOADING SCREEN -->
+  <div id="global-preloader" aria-hidden="false">
+    <div class="preloader-content">
+      <div class="preloader-lottie-wrap">
+        <dotlottie-wc src="https://lottie.host/ebd0581a-49f0-466c-8bf7-98fba6365321/7kq4s2U4U1.lottie" style="width: 220px; height: 220px;" autoplay loop></dotlottie-wc>
+      </div>
+      <div class="preloader-brand">
+        <span class="preloader-brand-name">SHAIVIKA</span>
+        <span class="preloader-brand-sub">IT TECHNOLOGIES</span>
+      </div>
+      <div class="preloader-progress-bar">
+        <div class="preloader-progress-fill"></div>
       </div>
     </div>
   </div>
-  <script>
-    (function() {
-      const loader = document.getElementById('global-preloader');
-      if (!loader) return;
-      
-      function updateOnlineStatus() {
-        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || navigator.onLine) {
-          loader.classList.add('preloader-hidden');
-        } else {
-          loader.classList.remove('preloader-hidden');
-        }
-      }
 
-      // Check status immediately
-      updateOnlineStatus();
+<!-- NAVIGATION -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">
+        <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_80/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" 
+             alt="SHAIVIKA Logo" class="nav-brand-logo" width="40" height="40" />
+        <div class="nav-brand-text">
+          <span class="nav-brand-name">SHAIVIKA</span>
+          <span class="nav-brand-tag">IT TECHNOLOGIES</span>
+        </div>
+      </a>
 
-      // Listen for network status changes
-      window.addEventListener('online', updateOnlineStatus);
-      window.addEventListener('offline', updateOnlineStatus);
-    })();
-  </script>
-  <style>
-    @keyframes pulse {
-      0% { transform: scale(0.9); opacity: 0.6; }
-      50% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.6; }
-    }
-  </style>
-
-    <!-- NAVBAR -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-          <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_112/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" alt="Shaivika IT Technologies Logo" class="logo-main-img" width="56" height="56" fetchpriority="high">
-          <div class="nav-logo-text-wrapper" style="display: flex; flex-direction: column; justify-content: center; margin-left: 8px;">
-              <div class="nav-brand-main" style="font-family: var(--font-primary), sans-serif; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: 2px; line-height: 1;">SHAIVIKA</div>
-              <div class="nav-brand-sub" style="font-family: var(--font-primary), sans-serif; font-size: 11px; font-weight: 700; color: #a272eb; letter-spacing: 3.5px; line-height: 1; margin-top: 5px;">IT TECHNOLOGIES</div>
-          </div>
-        </a>
-            <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="services.html" class="active">Services</a></li>
-        <li><a href="portfolio.html">Portfolio</a></li>
-        <li><a href="contact.html">Contact</a></li>
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="solutions.html" class="nav-link active">Solutions</a></li>
+        <li><a href="work.html" class="nav-link">Work</a></li>
+        <li><a href="process.html" class="nav-link">Process</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+        <li><a href="insights.html" class="nav-link">Insights</a></li>
       </ul>
-            <div class="nav-cta">
-          <button class="theme-toggle-btn" aria-label="Toggle Theme">🌙</button>
-                <a href="contact.html" class="btn btn-ghost btn-sm">Get in Touch</a>
-                <a href="contact.html" class="btn btn-primary btn-sm">Get a Quote</a>
-            </div>
-            <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-        </div>
-    </nav>
-    <div class="mobile-nav" id="mobileNav">
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="services.html" class="active">Services</a></li>
-            <li><a href="portfolio.html">Portfolio</a></li>
-            <li><a href="contact.html">Contact</a></li>
-        </ul>
-        <div class="mobile-nav-cta">
-          <button class="theme-toggle-btn" aria-label="Toggle Theme" style="margin-right: 15px;">🌙</button>
-            <a href="contact.html" class="btn btn-ghost">Get in Touch</a>
-            <a href="contact.html" class="btn btn-primary">Get a Quote</a>
-        </div>
-    </div>
 
-    <!-- PAGE HERO -->
-    <section class="page-hero">
-        <div class="hero-bg"></div>
-        <div class="hero-grid"></div>
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="hero-content">
-            <div class="section-badge">Complete IT Suite</div>
-            <h1 class="section-title" style="font-size:clamp(2.5rem,5vw,4rem);">Shaivika IT Technologies – <span
-                    class="gradient-text">Services</span></h1>
-            <p class="section-subtitle" style="margin:0 auto;">From manual custom services to full SaaS platforms —
-                everything your business needs to thrive in the digital age.</p>
-        </div>
-    </section>
-
-    <!-- SERVICES LAYOUT WITH SIDEBAR -->
-    <section style="padding:60px 0 100px;">
-        <div class="container">
-            <div class="services-layout">
-
-                <!-- SIDEBAR NAV -->
-                <aside class="services-sidebar">
-                    <div class="sidebar-title">Navigation</div>
-                    <ul class="sidebar-nav" id="servicesSidebar">
-                        <li>
-                            <a href="#panel-pages" class="active" data-panel="pages">
-                                <span class="nav-icon">📄</span> Pages
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#panel-manual" data-panel="manual">
-                                <span class="nav-icon">🛠️</span> Manual Services
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#panel-saas" data-panel="saas">
-                                <span class="nav-icon">☁️</span> SaaS Services
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#panel-courses" data-panel="courses">
-                                <span class="nav-icon">🎓</span> Learning Courses
-                            </a>
-                        </li>
-                    </ul>
-                </aside>
-
-                <!-- CONTENT PANELS -->
-                <div class="services-content">
-
-                    <!-- PAGES PANEL -->
-                    <div class="services-panel active" id="panel-pages">
-                        <div class="section-badge">Quick Access</div>
-                        <h2 class="services-section-title">Service <span class="gradient-text">Pages</span></h2>
-                        <p class="services-section-desc">Jump directly to the service category that best fits your
-                            business needs.</p>
-                        <div class="service-list-grid">
-                            <div class="service-list-item reveal delay-1" style="cursor:pointer;"
-                                onclick="switchPanel('manual')">
-                                <div class="sli-icon">🛠️</div>
-                                <div>
-                                    <div class="sli-title">Manual Services</div>
-                                    <p class="sli-desc">Custom-built web apps, AI automations, SEO, dashboards,
-                                        chatbots, logo design, and more tailored solutions.</p>
-                                </div>
-                            </div>
-                            <div class="service-list-item reveal delay-2" style="cursor:pointer;"
-                                onclick="switchPanel('saas')">
-                                <div class="sli-icon">☁️</div>
-                                <div>
-                                    <div class="sli-title">SaaS Services</div>
-                                    <p class="sli-desc">20+ production-ready SaaS products — Real Estate CRM, AI Resume
-                                        Builder, ATS Systems, and more.</p>
-                                </div>
-                            </div>
-                            <div class="service-list-item reveal delay-3" style="cursor:pointer;"
-                                onclick="switchPanel('courses')">
-                                <div class="sli-icon">🎓</div>
-                                <div>
-                                    <div class="sli-title">Learning Courses</div>
-                                    <p class="sli-desc">Skill-based courses in AI, web development, automation, SEO, and
-                                        digital marketing for individuals and teams.</p>
-                                </div>
-                            </div>
-                            <div class="service-list-item reveal delay-4">
-                                <div class="sli-icon">📞</div>
-                                <div>
-                                    <div class="sli-title">Free Consultation</div>
-                                    <p class="sli-desc">Not sure which service fits? <a href="contact.html"
-                                            style="color:var(--accent);">Book a free call</a> with our experts and get a
-                                         custom recommendation.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MANUAL SERVICES PANEL -->
-                    <div class="services-panel" id="panel-manual">
-                        <div class="section-badge">Custom Solutions</div>
-                        <h2 class="services-section-title">Manual <span class="gradient-text">Engineering
-                                Services</span></h2>
-                        <p class="services-section-desc">Handcrafted, bespoke digital solutions by the best software
-                            company in Kadapa. We build
-                            digital systems that automate, scale and future-proof modern businesses.</p>
-
-                        <div class="service-list-grid">
-                            <!-- 1 -->
-                            <div class="service-list-item reveal delay-1" id="web-dev">
-                                <div class="sli-icon">🌐</div>
-                                <div>
-                                    <div class="sli-title">Web & App Development (2-in-1)</div>
-                                    <p class="sli-desc">Full-stack web and mobile app development using React, Next.js,
-                                        Node.js with responsive, mobile-first design for all screen sizes.</p>
-                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                         Quote</a>
-                                </div>
-                            </div>
-                            <!-- 2 AI Automations -->
-                            <div class="service-list-item reveal delay-2" id="ai-automation"
-                                style="flex-direction:column;">
-                                <div style="display:flex;gap:16px;align-items:flex-start;">
-                                    <div class="sli-icon">🤖</div>
-                                    <div>
-                                        <div class="sli-title">AI Automations Suite</div>
-                                        <p class="sli-desc">Leading AI automation company in Kadapa providing end-to-end
-                                            solutions across messaging platforms, HR, and business pipelines:</p>
-                                    </div>
-                                </div>
-                                <ul class="ai-sub-list">
-                                    <li>WhatsApp Automation</li>
-                                    <li>Telegram Automation</li>
-                                    <li>AI CRM Integration & SaaS Platforms</li>
-                                    <li>Invoice Billings Automation</li>
-                                    <li>AI Dashboards Automation (Telegram, WhatsApp)</li>
-                                    <li>AI HR Agents</li>
-                                    <li>ATS System for Companies</li>
-                                    <li>AI Calling Agents for Business (Cold Outreach)</li>
-                                    <li>Telegram Voice Agent</li>
-                                    
-                                    <li>Automated Login Security System</li>
-                                    <li>Social Media Posts AI Automation</li>
-                                </ul>
-                                <a href="contact.html" class="btn btn-primary btn-sm"
-                                    style="margin-top:16px;align-self:flex-start;">Get a Quote</a>
-                            </div>
-                            <!-- 3 -->
-                            <div class="service-list-item reveal delay-3" id="seo">
-                                <div class="sli-icon">🔍</div>
-                                <div>
-                                    <div class="sli-title">SEO Optimisation</div>
-                                    <p class="sli-desc">Technical SEO, on-page optimization, keyword research, backlink
-                                        strategy, and monthly performance tracking for higher rankings.</p>
-                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                         Quote</a>
-                                </div>
-                            </div>
-                            <!-- 4 -->
-                            <div class="service-list-item reveal delay-4" id="dashboards">
-                                <div class="sli-icon">📊</div>
-                                <div>
-                                    <div class="sli-title">Analytical Dashboards</div>
-                                    <p class="sli-desc">Real-time business intelligence dashboards with live data
-                                        integration, charts, KPIs, and automated reporting.</p>
-                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                         Quote</a>
-                                </div>
-                            </div>
-                            <!-- 5 -->
-                            <div class="service-list-item reveal delay-5" id="chatbots">
-                                <div class="sli-icon">💬</div>
-                                <div>
-                                    <div class="sli-title">AI Chatbot Builders</div>
-                                    <p class="sli-desc">Custom chatbots for website, WhatsApp, and Telegram — trained on
-                                        your business data for support, sales, and lead generation.</p>
-                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                         Quote</a>
-                                </div>
-                            </div>
-                            <!-- 6 -->
-                            <div class="service-list-item reveal delay-6">
-                                <div class="sli-icon">🎨</div>
-                                <div>
-                                    <div class="sli-title">Logo Designing</div>
-                                    <p class="sli-desc">Professional brand identity design — logos, brand kits, color
-                                        palettes, and typography systems that make lasting impressions.</p>
-                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                         Quote</a>
-                                </div>
-                            </div>
-                            <!-- 7 -->
-                            <div class="service-list-item reveal delay-1">
-                                <div class="sli-icon">🎬</div>
-                                <div>
-                                    <div class="sli-title">AI Video & Photo Business Promotions</div>
-                                    <p class="sli-desc">AI-generated videos, promotional reels, product photos, and
-                                        visual content for social media and marketing campaigns.</p>
-                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                         Quote</a>
-                                </div>
-                            </div>
-                            <!-- 8 -->
-                            <div class="service-list-item reveal delay-2">
-                                <div class="sli-icon">💍</div>
-                                <div>
-                                    <div class="sli-title">Virtual Wedding & Invitation Cards</div>
-                                    <p class="sli-desc">Beautiful digital wedding invitations and event cards with
-                                        animated design, RSVP integration, and instant WhatsApp sharing.</p>
-                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                         Quote</a>
-                                </div>
-                            </div>
-                            <!-- 9 -->
-                            <div class="service-list-item reveal delay-3">
-                                <div class="sli-icon">🎓</div>
-                                <div>
-                                    <div class="sli-title">Final Year Projects</div>
-                                    <p class="sli-desc">Full-stack final year projects for B.Tech/MCA/M.Tech with
-                                        complete documentation, deployment, and presentation support.</p>
-                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                         Quote</a>
-                                </div>
-                            </div>
-                            <!-- 10 -->
-                            <div class="service-list-item reveal delay-4">
-                                <div class="sli-icon">📋</div>
-                                <div>
-                                    <div class="sli-title">Custom CRM Systems</div>
-                                    <p class="sli-desc">Intelligent Customer Relationship Management systems with
-                                        automated follow-ups,
-                                        WhatsApp integration, and real-time lead tracking analytics.</p>
-                                    <a href="contact.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Get a
-                                         Quote</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SAAS SERVICES PANEL -->
-                    <div class="services-panel" id="panel-saas">
-                        <div class="section-badge">Ready-to-Deploy</div>
-                        <h2 class="services-section-title">SaaS <span class="gradient-text">Products</span></h2>
-                        <p class="services-section-desc">20+ production-ready SaaS platforms you can deploy and scale
-                            immediately — covering real estate, HR, finance, health, and more.</p>
-                        <div class="saas-grid" id="saas">
-                            
-                            <div class="saas-card reveal delay-1">
-                                <div style="font-size:28px;margin-bottom:10px;">🔄</div>
-                                <div class="saas-title">Smart Auto Multi CRM System</div>
-                                <p class="saas-desc">Manage multiple CRMs from one dashboard with AI automation syncing
-                                    data across platforms automatically.</p>
-                                <span class="tag tag-purple">Multi-CRM</span>
-                            </div>
-                            <div class="saas-card reveal delay-2">
-                                <div style="font-size:28px;margin-bottom:10px;">⚖️</div>
-                                <div class="saas-title">AI Legal Assistance & FIR Drafting</div>
-                                <p class="saas-desc">AI-powered legal document drafting, FIR complaint generation, legal
-                                    advice, and case management for individuals.</p>
-                                <span class="tag tag-blue">LegalTech</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- COURSES PANEL -->
-                    <div class="services-panel" id="panel-courses">
-                        <div class="section-badge">Skill Up</div>
-                        <h2 class="services-section-title">Learning <span class="gradient-text">Courses</span></h2>
-                        <p class="services-section-desc">Structured, hands-on courses taught by expert practitioners —
-                            designed for individuals, developers, and business teams ready to level up their digital
-                            skills.</p>
-                        <div class="course-grid">
-                            <div class="course-card reveal delay-1">
-                                <span class="course-icon">🌐</span>
-                                <div class="course-title">Full-Stack Web Development</div>
-                                <p class="course-desc">HTML, CSS, JavaScript, React, Node.js, databases and deployment.
-                                    From beginner to job-ready developer.</p>
-                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
-                                    Now</a>
-                            </div>
-                            <div class="course-card reveal delay-2">
-                                <span class="course-icon">🤖</span>
-                                <div class="course-title">AI & Automation Mastery</div>
-                                <p class="course-desc">WhatsApp bots, AI agents, workflow automation with n8n, Make, and
-                                    Python. Build real-world automation systems.</p>
-                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
-                                    Now</a>
-                            </div>
-                            <div class="course-card reveal delay-3">
-                                <span class="course-icon">🔍</span>
-                                <div class="course-title">SEO & Digital Marketing</div>
-                                <p class="course-desc">Technical SEO, Google Ads, social media marketing, email
-                                    campaigns, and analytics for business growth.</p>
-                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
-                                    Now</a>
-                            </div>
-                            <div class="course-card reveal delay-4">
-                                <span class="course-icon">📊</span>
-                                <div class="course-title">Data Analytics & Dashboards</div>
-                                <p class="course-desc">Power BI, Google Data Studio, SQL, Python pandas — build
-                                    dashboards that business leaders love.</p>
-                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
-                                    Now</a>
-                            </div>
-                            <div class="course-card reveal delay-5">
-                                <span class="course-icon">🎨</span>
-                                <div class="course-title">UI/UX Design</div>
-                                <p class="course-desc">Figma, glassmorphism, dark themes, design systems, prototyping,
-                                    and user research for modern interfaces.</p>
-                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
-                                    Now</a>
-                            </div>
-                            <div class="course-card reveal delay-6">
-                                <span class="course-icon">☁️</span>
-                                <div class="course-title">SaaS Product Building</div>
-                                <p class="course-desc">Build and launch your own SaaS product from idea to revenue —
-                                    architecture, coding, marketing, and scaling.</p>
-                                <a href="contact.html" class="btn btn-ghost btn-sm" style="margin-top:16px;">Enroll
-                                    Now</a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div><!-- end services-content -->
-            </div><!-- end services-layout -->
-        </div>
-    </section>
-
-    <!-- CTA -->
-    <section style="background:var(--bg-secondary);padding:80px 0;">
-        <div class="container" style="text-align:center;">
-            <div class="section-badge" style="margin:0 auto 20px;">Custom Project?</div>
-            <h2 class="section-title">Need a Tailored <span class="gradient-text">Solution?</span></h2>
-            <p class="section-subtitle" style="margin:0 auto 40px;">Tell us your requirements and we'll design a custom
-                solution that fits your budget, timeline, and goals perfectly.</p>
-            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-                <a href="contact.html" class="btn btn-primary btn-lg"><svg xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 48 48" width="24" height="24"
-                        style="vertical-align:middle;margin-right:8px; display:inline-block; transform: translateY(-1px);">
-                        <path fill="#40c351"
-                            d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z" />
-                        <path fill="#fff" fill-rule="evenodd"
-                            d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
-                            clip-rule="evenodd" />
-                    </svg> <span style="font-size: 16px; font-weight: 700;">WhatsApp Us</span></a>
-                <a href="portfolio.html" class="btn btn-ghost btn-lg">View Our Portfolio</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="index.html" class="nav-logo">
-          <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_80/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" alt="Shaivika IT Technologies Footer Logo" class="logo-main-img" width="40" height="40" loading="lazy">
-          <div class="nav-logo-text-wrapper" style="display: flex; flex-direction: column; justify-content: center; margin-left: 8px;">
-              <div class="nav-brand-main" style="font-family: var(--font-primary), sans-serif; font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: 2px; line-height: 1;">SHAIVIKA</div>
-              <div class="nav-brand-sub" style="font-family: var(--font-primary), sans-serif; font-size: 11px; font-weight: 700; color: #a272eb; letter-spacing: 3.5px; line-height: 1; margin-top: 5px;">IT TECHNOLOGIES</div>
-          </div>
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" aria-label="Toggle Theme">☀️</button>
+        <a href="contact.html" class="btn btn-primary btn-sm btn-arrow">
+          <span>Start a Project</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
         </a>
-                    <p>
-                        Shaivika IT Technologies is a trusted software company in Kadapa, Andhra Pradesh.
-                        We provide AI automation services, web development, SaaS solutions, CRM systems,
-                        and digital business tools for startups and enterprises across India.
-                    </p>
-                    <div class="footer-socials">
-                        <a href="https://wa.me/917981431094" class="social-btn"><svg xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 48 48" width="22" height="22">
-                                <path fill="#40c351"
-                                    d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z" />
-                                <path fill="#fff" fill-rule="evenodd"
-                                    d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
-                                    clip-rule="evenodd" />
-                            </svg></a>
-                        <a href="mailto:shaivikagroups@gmail.com" class="social-btn"><svg
-                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22">
-                                <path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z" />
-                                <path fill="#1e88e5" d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z" />
-                                <polygon fill="#e53935"
-                                    points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17" />
-                                <path fill="#c62828"
-                                    d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z" />
-                                <path fill="#fbc02d"
-                                    d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z" />
-                            </svg></a>
-                        <a href="https://www.linkedin.com/in/shaivika-groups-7823ab362?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
-                            class="social-btn" title="LinkedIn" target="_blank"><svg xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 48 48" width="22" height="22">
-                                <path fill="#0288D1"
-                                    d="M42,37c0,2.762-2.238,5-5,5H11c-2.761,0-5-2.238-5-5V11c0-2.762,2.239-5,5-5h26c2.762,0,5,2.238,5,5V37z" />
-                                <path fill="#FFF"
-                                    d="M12 19H17V36H12zM14.485 17h-.028C12.965 17 12 15.888 12 14.499 12 13.08 12.995 12 14.514 12c1.521 0 2.458 1.08 2.486 2.499C17 15.887 16.035 17 14.485 17zM36 36h-5v-9.099c0-2.198-1.225-3.698-3.192-3.698-1.501 0-2.313 1.012-2.707 1.99C24.957 25.543 25 26.511 25 27v9h-5V19h5v2.616C25.721 20.5 26.85 19 29.738 19c3.578 0 6.261 2.25 6.261 7.274L36 36 36 36z" />
-                            </svg></a>
-                        <a href="https://www.instagram.com/shaivika_india?igsh=cGdjNXB3eDgwbWk=" class="social-btn"
-                            title="Instagram" target="_blank"><svg xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 48 48" width="22" height="22">
-                                <radialGradient id="ig_gr1" cx="19.38" cy="42.035" r="44.899"
-                                    gradientUnits="userSpaceOnUse">
-                                    <stop offset="0" stop-color="#fd5" />
-                                    <stop offset=".328" stop-color="#ff543f" />
-                                    <stop offset=".348" stop-color="#fc5245" />
-                                    <stop offset=".504" stop-color="#e64771" />
-                                    <stop offset=".643" stop-color="#d53e91" />
-                                    <stop offset=".761" stop-color="#cc39a4" />
-                                    <stop offset=".841" stop-color="#c837ab" />
-                                </radialGradient>
-                                <path fill="url(#ig_gr1)"
-                                    d="M34.017,41.99l-20,0.019c-4.4,0.004-8.003-3.592-8.008-7.992l-0.019-20c-0.004-4.4,3.592-8.003,7.992-8.008l20-0.019c4.4-0.004,8.003,3.592,8.008,7.992l0.019,20C42.014,38.383,38.417,41.986,34.017,41.99z" />
-                                <path fill="#fff"
-                                    d="M24,31c-3.859,0-7-3.14-7-7s3.141-7,7-7s7,3.14,7,7S27.859,31,24,31z M24,19c-2.757,0-5,2.243-5,5s2.243,5,5,5s5-2.243,5-5S26.757,19,24,19z" />
-                                <circle cx="31.5" cy="16.5" r="1.5" fill="#fff" />
-                                <path fill="#fff"
-                                    d="M30,37H18c-3.859,0-7-3.14-7-7V18c0-3.86,3.141-7,7-7h12c3.859,0,7,3.14,7,7v12C37,33.86,33.859,37,30,37z M18,13c-2.757,0-5,2.243-5,5v12c0,2.757,2.243,5,5,5h12c2.757,0,5-2.243,5-5V18c0-2.757-2.243-5-5-5H18z" />
-                            </svg></a>
-                    </div>
-                </div>
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="portfolio.html">Portfolio</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Services</h4>
-                    <ul class="footer-links">
-                        <li><a href="#panel-manual" onclick="switchPanel('manual');return false;">Manual Services</a></li>
-                        <li><a href="#panel-saas" onclick="switchPanel('saas');return false;">SaaS Products</a></li>
-                        <li><a href="#panel-courses" onclick="switchPanel('courses');return false;">Learning Courses</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Contact</h4>
-                    <ul class="footer-links">
-                        <li><a href="tel:+917981431094"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
-                    <path fill="#43a047"
-                                        d="M13.25 21.59c2.88 5.66 7.51 10.29 13.18 13.17l4.4-4.41c.55-.55 1.34-.71 2.03-.49C35.1 30.6 37.51 31 40 31c1.1 0 2 .9 2 2v7c0 1.1-.9 2-2 2C21.22 42 6 26.78 6 8c0-1.1.9-2 2-2h7c1.1 0 2 .9 2 2 0 2.5.4 4.9 1.14 7.14.22.69.06 1.48-.49 2.03l-4.4 4.42z" />
-                                </svg> +91 7981431094</a></li>
-                        <li><a href="mailto:shaivikagroups@gmail.com"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
-                    <path fill="#4caf50"
-                                        d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z" />
-                                    <path fill="#1e88e5"
-                                        d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z" />
-                                    <polygon fill="#e53935"
-                                        points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17" />
-                                    <path fill="#c62828"
-                                        d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z" />
-                                    <path fill="#fbc02d"
-                                        d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z" />
-                                </svg> shaivikagroups</a></li>
-                        <li><a href="https://wa.me/917981431094"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
-                    <path fill="#40c351"
-                                        d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z" />
-                                    <path fill="#fff" fill-rule="evenodd"
-                                        d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
-                                        clip-rule="evenodd" />
-                                </svg> WhatsApp</a></li>
-                        <li><a href="contact.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" style="flex-shrink: 0;">
-                    <path fill="#e53935"
-                                        d="M24 4C16.27 4 10 10.27 10 18c0 11.25 14 26 14 26s14-14.75 14-26c0-7.73-6.27-14-14-14zm0 19c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
-                                </svg> Kadapa, AP</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>© 2025 Shaivika IT Technologies. All rights reserved.</p>
-                <p>Crafted with ❤️ by Shaivika Groups in Kadapa, Andhra Pradesh</p>
-            </div>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MOBILE NAV -->
+  <div class="mobile-nav" id="mobileNav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="solutions.html">Solutions</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="process.html">Process</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="insights.html">Insights</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <a href="contact.html" class="btn btn-primary btn-lg">Start a Project</a>
+    </div>
+  </div>
+
+  <main>
+    <!-- PAGE HEADER -->
+    <header class="hero" style="padding-bottom: 40px;">
+      <div class="container" style="text-align: center;">
+        <div class="section-eyebrow" style="margin: 0 auto 16px;">
+          <span class="eyebrow-dot"></span>
+          SOLUTIONS &amp; ENGINEERING CAPABILITIES
         </div>
-    </footer>
+        <h1 class="section-title" style="max-width: 800px; margin: 0 auto 20px;">
+          Technology That Solves Real <span class="gradient-text">Business Problems</span>
+        </h1>
+        <p class="section-subtitle" style="margin: 0 auto; max-width: 680px;">
+          We combine product thinking, software engineering, and AI to build digital systems that are practical, scalable, and ready for growth.
+        </p>
+      </div>
+    </header>
 
-    <script src="js/main.min.js?v=9" defer></script>
-    <script>
-        function switchPanel(panelId) {
-            // Hide all panels
-            document.querySelectorAll('.services-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('#servicesSidebar a').forEach(a => a.classList.remove('active'));
-            // Show target
-            const panel = document.getElementById('panel-' + panelId);
-            if (panel) panel.classList.add('active');
-            const link = document.querySelector(`#servicesSidebar a[data-panel="${panelId}"]`);
-            if (link) link.classList.add('active');
-            // Scroll to sidebar
-            document.querySelector('.services-layout')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+    <!-- DETAILED SOLUTIONS -->
+    <section>
+      <div class="container">
+        <div class="work-grid">
+          
+          <!-- Solution 1: AI Solutions -->
+          <article class="project-feature-card reveal" id="ai-solutions">
+            <div class="project-content">
+              <span class="project-meta-pill">Machine Intelligence • LLM Integration</span>
+              <h2 class="project-title">AI Solutions &amp; Intelligent Assistants</h2>
+              <p class="project-summary">
+                We design and integrate pragmatic AI capabilities that automate operations, assist human teams, and streamline customer interactions. We reject superficial gimmickry in favor of measurable operational leverage.
+              </p>
+              <div class="features-checklist" style="margin: 0 0 24px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>AI Assistants &amp; Chatbots:</strong> Natural language conversational agents for customer support and sales qualifying.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Document Intelligence:</strong> Automated data extraction from invoices, contracts, IDs, and unstructured PDFs.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>RAG Architecture:</strong> Grounded LLM queries referencing your internal knowledge base without hallucinations.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Intelligent Workflows:</strong> Agentic task execution connecting LLM reasoning with real APIs and CRM pipelines.</span>
+                </div>
+              </div>
+              <div>
+                <a href="contact.html?type=AI+Solution" class="btn btn-primary btn-sm btn-arrow">
+                  <span>Inquire About AI Solutions</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:var(--electric-blue);margin-bottom:12px;">ACTIVE AI INFERENCE ARCHITECTURE</div>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--text-secondary);">
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">1. Client Prompt Ingestion &amp; Sanitization</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">2. Semantic Vector Similarity Search</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">3. Gemini / Claude Context Augmentation</div>
+                  <div style="background:rgba(37,99,235,0.15);border:1px solid #3b82f6;padding:10px;border-radius:6px;color:#ffffff;">4. Verified Structured JSON Execution</div>
+                </div>
+              </div>
+            </div>
+          </article>
 
-        document.querySelectorAll('#servicesSidebar a[data-panel]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchPanel(link.dataset.panel);
-            });
-        });
+          <!-- Solution 2: SaaS Product Development -->
+          <article class="project-feature-card reverse reveal" id="saas-development">
+            <div class="project-content">
+              <span class="project-meta-pill">Cloud Architecture • Subscription Engines</span>
+              <h2 class="project-title">SaaS Product Development</h2>
+              <p class="project-summary">
+                From validating an MVP to scaling a multi-tenant enterprise platform, we engineer reliable software-as-a-service applications with rock-solid security, fast latency, and resilient billing integrations.
+              </p>
+              <div class="features-checklist" style="margin: 0 0 24px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>MVP to Production:</strong> Rapid prototyping and high-velocity sprints to get your product in front of users fast.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Multi-Tenant Architecture:</strong> Clean database partitioning and workspace isolation for commercial clients.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Automated Subscription Billing:</strong> Global payments, recurring subscriptions, invoices, and self-serve upgrades.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>User Management &amp; RBAC:</strong> Granular permissions, SSO options, audit logs, and secure authentication.</span>
+                </div>
+              </div>
+              <div>
+                <a href="contact.html?type=SaaS" class="btn btn-primary btn-sm btn-arrow">
+                  <span>Discuss Your SaaS Product</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:#10b981;margin-bottom:12px;">MULTI-TENANT SAAS SPECIFICATION</div>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--text-secondary);">
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• Tenant Isolation: PostgreSQL RLS / Schemas</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• Billing Gateway: Stripe / Paddle Webhooks</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• Real-Time WebSockets: Live telemetry sync</div>
+                  <div style="background:rgba(16,185,129,0.15);border:1px solid #10b981;padding:10px;border-radius:6px;color:#ffffff;">• Uptime Target: 99.9% High Availability</div>
+                </div>
+              </div>
+            </div>
+          </article>
 
-        // Handle URL hash
-        const hash = window.location.hash.slice(1);
-        if (hash) {
-            const el = document.getElementById(hash);
-            if (el) {
-                const panel = el.closest('.services-panel');
-                if (panel) {
-                    const panelId = panel.id.replace('panel-', '');
-                    switchPanel(panelId);
-                    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
-                }
-            }
-        }
-    </script>
-  <!-- WHATSAPP FLOATING BUTTON -->
-  <a href="https://wa.me/917981431094" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="30" height="30" fill="currentColor">
-      <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3 18.7-68.1-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
-    </svg>
-  </a>
+          <!-- Solution 3: Web Application Development -->
+          <article class="project-feature-card reveal" id="web-applications">
+            <div class="project-content">
+              <span class="project-meta-pill">Modern React &amp; Next.js Ecosystem</span>
+              <h2 class="project-title">Web Application Development</h2>
+              <p class="project-summary">
+                High-performance web portals, customer platforms, and administrative backends engineered for speed, clean interfaces, and cross-browser resilience.
+              </p>
+              <div class="features-checklist" style="margin: 0 0 24px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Customer Portals:</strong> Intuitive self-service dashboards where clients manage orders, projects, and assets.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Internal Business Systems:</strong> Purpose-built software to replace fragmented spreadsheets and legacy tools.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>High-Performance UI:</strong> Sub-second load times, smooth micro-interactions, and accessible typography.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>RESTful API Clusters:</strong> Structured, versioned endpoints built on Node.js and scalable cloud runners.</span>
+                </div>
+              </div>
+              <div>
+                <a href="contact.html?type=Web+Application" class="btn btn-primary btn-sm btn-arrow">
+                  <span>Build a Web Application</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:#c084fc;margin-bottom:12px;">FRONTEND EXCELLENCE METRICS</div>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--text-secondary);">
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• First Contentful Paint: &lt; 0.9s</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• Cumulative Layout Shift (CLS): 0.00</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• WCAG 2.1 AA Accessibility Compliant</div>
+                  <div style="background:rgba(124,58,237,0.15);border:1px solid #7c3aed;padding:10px;border-radius:6px;color:#ffffff;">• Full 320px to 4K Responsive Testing</div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Solution 4: E-Commerce Development -->
+          <article class="project-feature-card reverse reveal" id="ecommerce">
+            <div class="project-content">
+              <span class="project-meta-pill">Direct-to-Consumer • Cloud Media</span>
+              <h2 class="project-title">E-Commerce Development</h2>
+              <p class="project-summary">
+                Bespoke digital storefronts that combine rich editorial aesthetics with frictionless checkout funnels, cloud media optimization, and automated inventory sync.
+              </p>
+              <div class="features-checklist" style="margin: 0 0 24px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>High-Fidelity Catalogs:</strong> Dynamic product faceting, instant variant switching, and rich media galleries.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Global Checkout:</strong> Multi-currency pricing, localized tax calculation, and 1-click mobile wallets.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Cloud CDN Media:</strong> Sub-70kb compressed image streaming preserving ultra-fine visual details.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Order &amp; Inventory Sync:</strong> Real-time webhook notifications for fulfillment and dispatch pipelines.</span>
+                </div>
+              </div>
+              <div>
+                <a href="contact.html?type=E-Commerce" class="btn btn-primary btn-sm btn-arrow">
+                  <span>Launch an E-Commerce Store</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:#f59e0b;margin-bottom:12px;">COMMERCE CHECKOUT CONVERSION</div>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--text-secondary);">
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• 2-Step Express Checkout Funnel</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• Dynamic Cloudinary NextGen WebP/AVIF</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• Atomic inventory reservation locks</div>
+                  <div style="background:rgba(245,158,11,0.15);border:1px solid #f59e0b;padding:10px;border-radius:6px;color:#ffffff;">• PCI-DSS Compliant Payment Tokenization</div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Solution 5: Business Automation -->
+          <article class="project-feature-card reveal" id="automation">
+            <div class="project-content">
+              <span class="project-meta-pill">Workflow Orchestration • API Glue</span>
+              <h2 class="project-title">Business Automation &amp; CRM Integrations</h2>
+              <p class="project-summary">
+                Eliminate manual data re-entry and delayed customer responses by synchronizing your inbound leads, transactional messaging, internal alerts, and databases into automated event triggers.
+              </p>
+              <div class="features-checklist" style="margin: 0 0 24px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Lead Capture &amp; Routing:</strong> Instant qualification and assignment to sales representatives within seconds.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Messaging Channels:</strong> Automated notifications and customer updates via WhatsApp, Email, and SMS.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Custom CRM Logic:</strong> Pipeline stage triggers, follow-up scheduling, and automated activity logging.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Third-Party Integrations:</strong> Connecting Google Sheets, Airtable, Slack, Stripe, and internal ERP systems.</span>
+                </div>
+              </div>
+              <div>
+                <a href="contact.html?type=Automation" class="btn btn-primary btn-sm btn-arrow">
+                  <span>Automate Workflows</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:var(--electric-blue);margin-bottom:12px;">WORKFLOW PIPELINE TOPOLOGY</div>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--text-secondary);">
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">Event: Inbound Website Inquiry</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">Trigger: Lead Qualification Filter</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">Action 1: Dispatch WhatsApp Confirmation</div>
+                  <div style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;padding:10px;border-radius:6px;color:#ffffff;">Action 2: Sync CRM Record &amp; Alert Team</div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Solution 6: Data & Analytics -->
+          <article class="project-feature-card reverse reveal" id="analytics">
+            <div class="project-content">
+              <span class="project-meta-pill">Telemetry • Business Intelligence</span>
+              <h2 class="project-title">Data &amp; Analytics Dashboards</h2>
+              <p class="project-summary">
+                Clear, uncluttered data visualization interfaces that provide executive leadership and operational teams with real-time insight into performance metrics and user behavior.
+              </p>
+              <div class="features-checklist" style="margin: 0 0 24px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Live Metric Streaming:</strong> WebSocket and server-sent event dashboards updating in real time.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Custom KPI Tracking:</strong> Business metrics tailored precisely to your operational targets.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Automated Reporting:</strong> Scheduled PDF summaries and email digest alerts for key stakeholders.</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span><strong>Data Aggregation:</strong> Consolidating disparate data streams into unified analytical models.</span>
+                </div>
+              </div>
+              <div>
+                <a href="contact.html?type=Web+Application" class="btn btn-primary btn-sm btn-arrow">
+                  <span>Build an Analytics Dashboard</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:#10b981;margin-bottom:12px;">TELEMETRY DASHBOARD CAPABILITIES</div>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--text-secondary);">
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• Sub-Second Chart Renders</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• Time-Series Cohort Analysis</div>
+                  <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;">• Role-Filtered Security Permissions</div>
+                  <div style="background:rgba(16,185,129,0.15);border:1px solid #10b981;padding:10px;border-radius:6px;color:#ffffff;">• CSV / PDF Automated Export Engine</div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- PRE-FOOTER CTA -->
+    <section class="cta-banner-section">
+      <div class="container">
+        <div class="cta-banner-card reveal">
+          <div class="section-eyebrow cta-eyebrow">
+            READY TO START
+          </div>
+          <h2 class="cta-banner-title">Let's discuss which solution fits your business goals.</h2>
+          <p class="cta-banner-desc">
+            Schedule an introductory consultation or tell us what you're looking to build.
+          </p>
+          <div class="cta-banner-actions">
+            <a href="contact.html" class="btn btn-primary btn-lg">Start a Project</a>
+            <a href="work.html" class="btn btn-ghost btn-lg">Explore Our Work</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-main-grid">
+        <div class="footer-brand-col">
+          <a href="index.html" class="nav-brand">
+            <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_80/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" 
+                 alt="SHAIVIKA Logo" class="nav-brand-logo" width="36" height="36" />
+            <div class="nav-brand-text">
+              <span class="nav-brand-name" style="font-size:1rem;">SHAIVIKA</span>
+              <span class="nav-brand-tag">IT TECHNOLOGIES</span>
+            </div>
+          </a>
+          <p>
+            AI, SaaS, software engineering, and digital solutions for businesses worldwide.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Solutions</h4>
+          <ul class="footer-links-list">
+            <li><a href="solutions.html#ai-solutions">AI Solutions</a></li>
+            <li><a href="solutions.html#saas-development">SaaS Development</a></li>
+            <li><a href="solutions.html#web-applications">Web Applications</a></li>
+            <li><a href="solutions.html#ecommerce">E-Commerce</a></li>
+            <li><a href="solutions.html#automation">Automation</a></li>
+            <li><a href="solutions.html#analytics">Analytics</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Company</h4>
+          <ul class="footer-links-list">
+            <li><a href="about.html">About</a></li>
+            <li><a href="work.html">Work</a></li>
+            <li><a href="process.html">Process</a></li>
+            <li><a href="insights.html">Insights</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Connect</h4>
+          <ul class="footer-links-list">
+            <li><a href="https://www.linkedin.com/in/shaivika-groups-7823ab362" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+            <li><a href="mailto:shaivikagroups@gmail.com">Email Us</a></li>
+            <li><a href="https://wa.me/917981431094" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
+            <li><a href="https://www.instagram.com/shaivika_india" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <div>© 2026 SHAIVIKA IT TECHNOLOGIES. All rights reserved.</div>
+        <div class="footer-bottom-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.min.js?v=2026" defer></script>
 </body>
 
 </html>

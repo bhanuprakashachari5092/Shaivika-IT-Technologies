@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  
+  <title>Engineering Process | SHAIVIKA IT TECHNOLOGIES</title>
+  <meta name="description"
+    content="From Idea to Production: A structured 5-step software development methodology that eliminates ambiguity, maintains velocity, and ships reliable digital products." />
+  <link rel="canonical" href="https://shaivikaittechnologies.in/process.html" />
+
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_600/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" />
+  <link rel="icon" type="image/webp" href="img/favicon.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="css/style.min.css?v=2026" />
+  <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js" type="module"></script>
+</head>
+
+<body>
+    <!-- GLOBAL PRELOADER / SHAIVIKA LOADING SCREEN -->
+  <div id="global-preloader" aria-hidden="false">
+    <div class="preloader-content">
+      <div class="preloader-lottie-wrap">
+        <dotlottie-wc src="https://lottie.host/ebd0581a-49f0-466c-8bf7-98fba6365321/7kq4s2U4U1.lottie" style="width: 220px; height: 220px;" autoplay loop></dotlottie-wc>
+      </div>
+      <div class="preloader-brand">
+        <span class="preloader-brand-name">SHAIVIKA</span>
+        <span class="preloader-brand-sub">IT TECHNOLOGIES</span>
+      </div>
+      <div class="preloader-progress-bar">
+        <div class="preloader-progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+<!-- NAVIGATION -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">
+        <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_80/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" 
+             alt="SHAIVIKA Logo" class="nav-brand-logo" width="40" height="40" />
+        <div class="nav-brand-text">
+          <span class="nav-brand-name">SHAIVIKA</span>
+          <span class="nav-brand-tag">IT TECHNOLOGIES</span>
+        </div>
+      </a>
+
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="solutions.html" class="nav-link">Solutions</a></li>
+        <li><a href="work.html" class="nav-link">Work</a></li>
+        <li><a href="process.html" class="nav-link active">Process</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+        <li><a href="insights.html" class="nav-link">Insights</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" aria-label="Toggle Theme">☀️</button>
+        <a href="contact.html" class="btn btn-primary btn-sm btn-arrow">
+          <span>Start a Project</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </a>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MOBILE NAV -->
+  <div class="mobile-nav" id="mobileNav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="solutions.html">Solutions</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="process.html">Process</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="insights.html">Insights</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <a href="contact.html" class="btn btn-primary btn-lg">Start a Project</a>
+    </div>
+  </div>
+
+  <main>
+    <!-- PAGE HEADER -->
+    <header class="hero" style="padding-bottom: 40px;">
+      <div class="container" style="text-align: center;">
+        <div class="section-eyebrow" style="margin: 0 auto 16px;">
+          <span class="eyebrow-dot"></span>
+          DELIVERY LIFECYCLE
+        </div>
+        <h1 class="section-title" style="max-width: 800px; margin: 0 auto 20px;">
+          From Idea to <span class="gradient-text">Production</span>
+        </h1>
+        <p class="section-subtitle" style="margin: 0 auto; max-width: 680px;">
+          A disciplined, 5-step engineering framework designed to eliminate guesswork, reduce time-to-market, and deliver reliable software systems.
+        </p>
+      </div>
+    </header>
+
+    <!-- DETAILED 5 STEPS -->
+    <section>
+      <div class="container">
+        <div class="work-grid">
+          
+          <!-- Step 1 -->
+          <div class="project-feature-card reveal">
+            <div class="project-content">
+              <span class="step-num" style="font-size:2.5rem;margin-bottom:8px;">01</span>
+              <h2 class="project-title">Discover &amp; Scope</h2>
+              <p class="project-summary">
+                Before writing any code, we dive deep into your business objectives, operational workflows, and technical constraints. We define measurable milestones and establish a practical MVP scope.
+              </p>
+              <div class="features-checklist" style="margin:0 0 20px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Stakeholder interviews &amp; requirement mapping</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Architecture &amp; technology evaluation</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Risk analysis &amp; security compliance check</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Milestone-based sprint roadmap definition</span>
+                </div>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:var(--electric-blue);margin-bottom:8px;">DELIVERABLES AT STEP 01</div>
+                <ul style="list-style:none;font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:8px;">
+                  <li>• Technical Specification Document (PRD)</li>
+                  <li>• System Architecture Blueprint</li>
+                  <li>• Sprint Schedule &amp; Budget Timeline</li>
+                  <li>• Shared Communication Workspace</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="project-feature-card reverse reveal">
+            <div class="project-content">
+              <span class="step-num" style="font-size:2.5rem;margin-bottom:8px;">02</span>
+              <h2 class="project-title">Design &amp; Architecture</h2>
+              <p class="project-summary">
+                We craft responsive interfaces, clickable prototypes, and system schemas. Every screen is designed with conversion flow, accessibility, and visual polish in mind.
+              </p>
+              <div class="features-checklist" style="margin:0 0 20px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Wireframing &amp; interactive user journeys</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Design system tokens (Typography, Grids, Surfaces)</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Database schema &amp; API contract modeling</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Responsive viewport stress testing (320px–4K)</span>
+                </div>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:#10b981;margin-bottom:8px;">DELIVERABLES AT STEP 02</div>
+                <ul style="list-style:none;font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:8px;">
+                  <li>• High-Fidelity Interactive Prototypes</li>
+                  <li>• Component Library &amp; Asset Catalog</li>
+                  <li>• API Contract Specifications (OpenAPI)</li>
+                  <li>• Database ERD Models</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="project-feature-card reveal">
+            <div class="project-content">
+              <span class="step-num" style="font-size:2.5rem;margin-bottom:8px;">03</span>
+              <h2 class="project-title">Build &amp; Engineer</h2>
+              <p class="project-summary">
+                Our engineers write clean, modular, and maintainable code in iterative sprints. We deploy to private staging environments after each sprint so you can test features as they are built.
+              </p>
+              <div class="features-checklist" style="margin:0 0 20px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Modern frontend engineering (React, Next.js, Vite)</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Scalable backend microservices &amp; RESTful APIs</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Pragmatic AI prompt &amp; model integration</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Staging review links with automated builds</span>
+                </div>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:#c084fc;margin-bottom:8px;">DELIVERABLES AT STEP 03</div>
+                <ul style="list-style:none;font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:8px;">
+                  <li>• Working Staging Environment</li>
+                  <li>• Clean Git Repository with Commit History</li>
+                  <li>• Automated Unit &amp; Integration Tests</li>
+                  <li>• Weekly Sprint Demonstrations</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="project-feature-card reverse reveal">
+            <div class="project-content">
+              <span class="step-num" style="font-size:2.5rem;margin-bottom:8px;">04</span>
+              <h2 class="project-title">Test &amp; Launch</h2>
+              <p class="project-summary">
+                We perform security audits, cross-browser validation, load testing, and database index tuning before pushing your system live to production.
+              </p>
+              <div class="features-checklist" style="margin:0 0 20px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>End-to-end regression &amp; usability testing</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Production security hardening &amp; SSL/TLS setup</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>DNS routing, CDN caching, and edge acceleration</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Zero-downtime deployment pipelines</span>
+                </div>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:#f59e0b;margin-bottom:8px;">DELIVERABLES AT STEP 04</div>
+                <ul style="list-style:none;font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:8px;">
+                  <li>• Production Cloud Deployment</li>
+                  <li>• DNS &amp; Domain SSL Configuration</li>
+                  <li>• Lighthouse Audit Report (90+ Scores)</li>
+                  <li>• Security Hardening Verification</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="project-feature-card reveal">
+            <div class="project-content">
+              <span class="step-num" style="font-size:2.5rem;margin-bottom:8px;">05</span>
+              <h2 class="project-title">Grow &amp; Iterate</h2>
+              <p class="project-summary">
+                Launching is only day one. We support your product with continuous telemetry monitoring, user behavior analysis, and sprint cycles for roadmap enhancements.
+              </p>
+              <div class="features-checklist" style="margin:0 0 20px 0;">
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Application uptime &amp; error telemetry monitoring</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>User feedback analysis &amp; UX optimization</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Automated database backups &amp; recovery testing</span>
+                </div>
+                <div class="feature-check-item">
+                  <span class="check-icon">✓</span>
+                  <span>Continuous feature delivery &amp; API expansion</span>
+                </div>
+              </div>
+            </div>
+            <div class="project-preview">
+              <div class="premium-card" style="width:100%;max-width:380px;">
+                <div style="font-size:12px;font-weight:700;color:var(--electric-blue);margin-bottom:8px;">DELIVERABLES AT STEP 05</div>
+                <ul style="list-style:none;font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;gap:8px;">
+                  <li>• 24/7 Cloud Telemetry Dashboard</li>
+                  <li>• Monthly Maintenance &amp; Patch Logs</li>
+                  <li>• Iteration Sprints for New Features</li>
+                  <li>• Continuous Performance Audits</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- PRE-FOOTER CTA -->
+    <section class="cta-banner-section">
+      <div class="container">
+        <div class="cta-banner-card reveal">
+          <div class="section-eyebrow cta-eyebrow">
+            LET'S TALK SPECIFICS
+          </div>
+          <h2 class="cta-banner-title">Ready to take your product from idea to production?</h2>
+          <p class="cta-banner-desc">
+            We'll review your requirements and provide an honest architectural assessment and timeline.
+          </p>
+          <div class="cta-banner-actions">
+            <a href="contact.html" class="btn btn-primary btn-lg">Start a Project</a>
+            <a href="work.html" class="btn btn-ghost btn-lg">View Our Work</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-main-grid">
+        <div class="footer-brand-col">
+          <a href="index.html" class="nav-brand">
+            <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_80/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" 
+                 alt="SHAIVIKA Logo" class="nav-brand-logo" width="36" height="36" />
+            <div class="nav-brand-text">
+              <span class="nav-brand-name" style="font-size:1rem;">SHAIVIKA</span>
+              <span class="nav-brand-tag">IT TECHNOLOGIES</span>
+            </div>
+          </a>
+          <p>
+            AI, SaaS, software engineering, and digital solutions for businesses worldwide.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Solutions</h4>
+          <ul class="footer-links-list">
+            <li><a href="solutions.html#ai-solutions">AI Solutions</a></li>
+            <li><a href="solutions.html#saas-development">SaaS Development</a></li>
+            <li><a href="solutions.html#web-applications">Web Applications</a></li>
+            <li><a href="solutions.html#ecommerce">E-Commerce</a></li>
+            <li><a href="solutions.html#automation">Automation</a></li>
+            <li><a href="solutions.html#analytics">Analytics</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Company</h4>
+          <ul class="footer-links-list">
+            <li><a href="about.html">About</a></li>
+            <li><a href="work.html">Work</a></li>
+            <li><a href="process.html">Process</a></li>
+            <li><a href="insights.html">Insights</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Connect</h4>
+          <ul class="footer-links-list">
+            <li><a href="https://www.linkedin.com/in/shaivika-groups-7823ab362" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+            <li><a href="mailto:shaivikagroups@gmail.com">Email Us</a></li>
+            <li><a href="https://wa.me/917981431094" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
+            <li><a href="https://www.instagram.com/shaivika_india" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <div>© 2026 SHAIVIKA IT TECHNOLOGIES. All rights reserved.</div>
+        <div class="footer-bottom-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.min.js?v=2026" defer></script>
+</body>
+
+</html>

@@ -16,7 +16,22 @@ function copyRecursive(src, dest) {
 }
 
 // 1. Sync HTML files
-const htmlFiles = ['index.html', 'about.html', 'services.html', 'portfolio.html', 'careers.html', 'contact.html', 'verify.html'];
+const htmlFiles = [
+  'index.html',
+  'solutions.html',
+  'services.html',
+  'work.html',
+  'portfolio.html',
+  'process.html',
+  'about.html',
+  'insights.html',
+  'contact.html',
+  'careers.html',
+  'privacy.html',
+  'terms.html',
+  'verify.html'
+];
+
 for (const f of htmlFiles) {
   if (fs.existsSync(f)) {
     fs.copyFileSync(f, path.join('dist', f));
@@ -25,7 +40,7 @@ for (const f of htmlFiles) {
 }
 
 // 2. Sync directories
-const dirs = ['css', 'js', 'img', 'data', 'admin'];
+const dirs = ['css', 'js', 'img', 'data', 'admin', 'work'];
 for (const d of dirs) {
   copyRecursive(d, path.join('dist', d));
   console.log(`Synced dir ${d} -> dist/${d}`);

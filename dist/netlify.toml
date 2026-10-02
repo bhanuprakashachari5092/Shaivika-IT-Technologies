@@ -30,3 +30,59 @@
   for = "/img/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Clean URL Redirects & Rewrites
+[[redirects]]
+  from = "/solutions"
+  to = "/solutions.html"
+  status = 200
+
+[[redirects]]
+  from = "/services"
+  to = "/solutions.html"
+  status = 301
+
+[[redirects]]
+  from = "/work"
+  to = "/work.html"
+  status = 200
+
+[[redirects]]
+  from = "/portfolio"
+  to = "/work.html"
+  status = 301
+
+[[redirects]]
+  from = "/process"
+  to = "/process.html"
+  status = 200
+
+[[redirects]]
+  from = "/about"
+  to = "/about.html"
+  status = 200
+
+[[redirects]]
+  from = "/insights"
+  to = "/insights.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+
+[[redirects]]
+  from = "/work/kaizenq"
+  to = "/work/kaizenq.html"
+  status = 200
+
+[[redirects]]
+  from = "/work/smr-car-travels"
+  to = "/work/smr-car-travels.html"
+  status = 200
+
+[[redirects]]
+  from = "/work/textile-ecommerce"
+  to = "/work/textile-ecommerce.html"
+  status = 200

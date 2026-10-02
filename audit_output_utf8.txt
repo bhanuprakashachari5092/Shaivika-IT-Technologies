@@ -1,6 +1,0 @@
-﻿--- 1. Link & Navigation Audits ---
-
---- Checking for empty or placeholder links (href="#") ---
-[WARNING] Found 7 empty link(s) (href="#") in services.html. Please verify if intentional.
-[WARNING] Found 11 empty link(s) (href="#") in blog.html. Please verify if intentional.
-[WARNING] Found 1 empty link(s) (href="#") in contact.html. Please verify if intentional.

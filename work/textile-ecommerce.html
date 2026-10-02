@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  
+  <title>Luxury Textile E-Commerce Case Study | Digital Commerce Architecture — SHAIVIKA IT TECHNOLOGIES</title>
+  <meta name="description"
+    content="Case study: How SHAIVIKA IT TECHNOLOGIES engineered a high-fidelity direct-to-consumer luxury textile e-commerce platform with cloud media and frictionless checkout." />
+  <link rel="canonical" href="https://shaivikaittechnologies.in/work/textile-ecommerce.html" />
+
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_600/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" />
+  <link rel="icon" type="image/webp" href="../img/favicon.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../css/style.min.css?v=2026" />
+  <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js" type="module"></script>
+</head>
+
+<body>
+    <!-- GLOBAL PRELOADER / SHAIVIKA LOADING SCREEN -->
+  <div id="global-preloader" aria-hidden="false">
+    <div class="preloader-content">
+      <div class="preloader-lottie-wrap">
+        <dotlottie-wc src="https://lottie.host/ebd0581a-49f0-466c-8bf7-98fba6365321/7kq4s2U4U1.lottie" style="width: 220px; height: 220px;" autoplay loop></dotlottie-wc>
+      </div>
+      <div class="preloader-brand">
+        <span class="preloader-brand-name">SHAIVIKA</span>
+        <span class="preloader-brand-sub">IT TECHNOLOGIES</span>
+      </div>
+      <div class="preloader-progress-bar">
+        <div class="preloader-progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+<!-- NAVIGATION -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="nav-brand">
+        <img src="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_80/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" 
+             alt="SHAIVIKA Logo" class="nav-brand-logo" width="40" height="40" />
+        <div class="nav-brand-text">
+          <span class="nav-brand-name">SHAIVIKA</span>
+          <span class="nav-brand-tag">IT TECHNOLOGIES</span>
+        </div>
+      </a>
+
+      <ul class="nav-menu">
+        <li><a href="../index.html" class="nav-link">Home</a></li>
+        <li><a href="../solutions.html" class="nav-link">Solutions</a></li>
+        <li><a href="../work.html" class="nav-link active">Work</a></li>
+        <li><a href="../process.html" class="nav-link">Process</a></li>
+        <li><a href="../about.html" class="nav-link">About</a></li>
+        <li><a href="../insights.html" class="nav-link">Insights</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" aria-label="Toggle Theme">☀️</button>
+        <a href="../contact.html" class="btn btn-primary btn-sm btn-arrow">
+          <span>Start a Project</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </a>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MOBILE NAV -->
+  <div class="mobile-nav" id="mobileNav">
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../solutions.html">Solutions</a></li>
+      <li><a href="../work.html">Work</a></li>
+      <li><a href="../process.html">Process</a></li>
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../insights.html">Insights</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <a href="../contact.html" class="btn btn-primary btn-lg">Start a Project</a>
+    </div>
+  </div>
+
+  <main>
+    <!-- CASE STUDY HERO -->
+    <header class="case-study-hero">
+      <div class="container">
+        <a href="../work.html" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--electric-blue);margin-bottom:20px;font-weight:600;">
+          ← Back to Selected Work
+        </a>
+        <div class="case-study-badge">03 — CASE STUDY OVERVIEW</div>
+        <h1 class="case-study-header-title">
+          Luxury Textile &amp; Apparel E-Commerce Platform
+        </h1>
+        <p class="case-study-lead">
+          How SHAIVIKA IT TECHNOLOGIES engineered a high-fidelity digital commerce experience featuring Cloudinary CDN optimization, instant variant switching, and a secure payment pipeline.
+        </p>
+
+        <div class="case-meta-grid">
+          <div class="meta-box">
+            <h5>Product Type</h5>
+            <p>Direct-to-Consumer Storefront</p>
+          </div>
+          <div class="meta-box">
+            <h5>Industry</h5>
+            <p>Luxury Textiles &amp; Fashion</p>
+          </div>
+          <div class="meta-box">
+            <h5>Key Technologies</h5>
+            <p>Next.js, Cloudinary, Stripe, Tailwind</p>
+          </div>
+          <div class="meta-box">
+            <h5>Focus Area</h5>
+            <p>Visual Fidelity &amp; Checkout Flow</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CASE STUDY CONTENT -->
+    <section class="case-study-content">
+      <div class="container" style="max-width: 900px;">
+        
+        <!-- 01 OVERVIEW -->
+        <div class="case-section-block">
+          <div class="case-section-tag">01 — OVERVIEW</div>
+          <h2 class="case-section-heading">Translating Premium Tactile Quality to Digital Screens</h2>
+          <p class="case-text-body">
+            Luxury apparel and handcrafted textiles demand an uncompromising visual presentation. In digital commerce, buyers need to inspect weave densities, silk lusters, and intricate embroidery before committing to high-order values.
+          </p>
+          <p class="case-text-body">
+            The brand needed a digital storefront that combined editorial elegance with technical agility — serving ultra-high-resolution imagery globally without page weight penalties.
+          </p>
+        </div>
+
+        <!-- 02 CHALLENGE -->
+        <div class="case-section-block">
+          <div class="case-section-tag">02 — THE CHALLENGE</div>
+          <h2 class="case-section-heading">Balancing Heavy Media with Speed and Conversion</h2>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:16px;margin:20px 0;">
+            <li style="display:flex;gap:12px;background:var(--bg-card);border:1px solid var(--border-subtle);padding:18px;border-radius:12px;">
+              <span style="color:#ef4444;font-weight:700;">•</span>
+              <div><strong>Heavy Image Payload:</strong> High-resolution 4K product photos caused severe page lag and mobile network timeouts on traditional hosting.</div>
+            </li>
+            <li style="display:flex;gap:12px;background:var(--bg-card);border:1px solid var(--border-subtle);padding:18px;border-radius:12px;">
+              <span style="color:#ef4444;font-weight:700;">•</span>
+              <div><strong>Complex Fabric Variants:</strong> Products came in multiple weave patterns, color dye batches, and custom cut lengths that required real-time inventory reconciliation.</div>
+            </li>
+            <li style="display:flex;gap:12px;background:var(--bg-card);border:1px solid var(--border-subtle);padding:18px;border-radius:12px;">
+              <span style="color:#ef4444;font-weight:700;">•</span>
+              <div><strong>International Checkout Friction:</strong> Support for global currencies, international shipping calculation, and multi-tier tax regulations.</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 03 STRATEGY -->
+        <div class="case-section-block">
+          <div class="case-section-tag">03 — STRATEGY</div>
+          <h2 class="case-section-heading">Cloud Media Pipeline &amp; Edge Delivery</h2>
+          <p class="case-text-body">
+            We decoupled the media asset pipeline using Cloudinary's dynamic transformation API. Images are delivered in next-gen WebP/AVIF formats tailored to the exact device viewport, accompanied by progressive blurred placeholders to guarantee zero layout shift.
+          </p>
+        </div>
+
+        <!-- 04 SOLUTION -->
+        <div class="case-section-block">
+          <div class="case-section-tag">04 — THE SOLUTION</div>
+          <h2 class="case-section-heading">A High-Performance Digital Commerce Architecture</h2>
+          <div class="features-checklist">
+            <div class="feature-check-item">
+              <span class="check-icon">✓</span>
+              <span><strong>Cloud-Optimized Media:</strong> Automatic responsive breakpoints, format negotiation, and micro-zoom inspectability.</span>
+            </div>
+            <div class="feature-check-item">
+              <span class="check-icon">✓</span>
+              <span><strong>Instant Variant Switching:</strong> Zero-refresh colorway and fabric pattern updates using React state memoization.</span>
+            </div>
+            <div class="feature-check-item">
+              <span class="check-icon">✓</span>
+              <span><strong>Frictionless Checkout:</strong> Unified two-step checkout with global payment support (Stripe, Apple Pay, Google Pay).</span>
+            </div>
+            <div class="feature-check-item">
+              <span class="check-icon">✓</span>
+              <span><strong>Real-Time Inventory Gate:</strong> Prevents overselling limited seasonal dye runs through atomic database locks.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 TECHNOLOGY -->
+        <div class="case-section-block">
+          <div class="case-section-tag">05 — TECHNOLOGY STACK</div>
+          <h2 class="case-section-heading">Engineered for Reliability &amp; Transaction Speed</h2>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;">
+            <span class="tech-chip">Next.js / React</span>
+            <span class="tech-chip">Node.js</span>
+            <span class="tech-chip">Cloudinary Media CDN</span>
+            <span class="tech-chip">Stripe API</span>
+            <span class="tech-chip">Tailwind CSS</span>
+            <span class="tech-chip">PostgreSQL</span>
+            <span class="tech-chip">Vercel Edge</span>
+          </div>
+        </div>
+
+        <!-- 06 KEY FEATURES -->
+        <div class="case-section-block">
+          <div class="case-section-tag">06 — KEY FEATURES</div>
+          <h2 class="case-section-heading">Delivered Commerce Capabilities</h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;">
+            <div class="premium-card">
+              <h4 style="font-size:1.1rem;margin-bottom:8px;color:var(--electric-blue);">Adaptive High-Res Gallery</h4>
+              <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">
+                Smooth pan and zoom controls allow connoisseurs to inspect weave textures without sacrificing frame rates.
+              </p>
+            </div>
+            <div class="premium-card">
+              <h4 style="font-size:1.1rem;margin-bottom:8px;color:var(--electric-blue);">Multi-Currency Pricing</h4>
+              <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">
+                Geo-detected pricing presentation in USD, GBP, EUR, AED, and AUD with automated currency conversion.
+              </p>
+            </div>
+            <div class="premium-card">
+              <h4 style="font-size:1.1rem;margin-bottom:8px;color:var(--electric-blue);">Cart Resilience</h4>
+              <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">
+                Persistent cart state across browser sessions and automatic email recovery hooks for abandoned checkout flows.
+              </p>
+            </div>
+            <div class="premium-card">
+              <h4 style="font-size:1.1rem;margin-bottom:8px;color:var(--electric-blue);">Catalog Faceting</h4>
+              <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">
+                Sub-millisecond filtering by material, weave density, occasion, and seasonal release collections.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 07 PRODUCT SCREENS -->
+        <div class="case-section-block">
+          <div class="case-section-tag">07 — ARCHITECTURE &amp; FLOW</div>
+          <h2 class="case-section-heading">E-Commerce Transaction Pipeline</h2>
+          <div class="architecture-diagram-box">
+            <div style="font-family:monospace;font-size:12px;color:var(--electric-blue);margin-bottom:16px;">
+              // LUXURY COMMERCE DISPATCH TOPOLOGY
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;color:var(--text-secondary);">
+              <div style="background:rgba(255,255,255,0.05);padding:12px 18px;border-radius:8px;border-left:3px solid #38bdf8;">
+                <strong>Edge Storefront:</strong> Static generation with incremental regeneration (ISR) for instant global TTFB.
+              </div>
+              <div style="background:rgba(255,255,255,0.05);padding:12px 18px;border-radius:8px;border-left:3px solid #2563eb;">
+                <strong>Media CDN:</strong> Cloudinary auto-formatting ensuring images load under 70kb without resolution degradation.
+              </div>
+              <div style="background:rgba(255,255,255,0.05);padding:12px 18px;border-radius:8px;border-left:3px solid #10b981;">
+                <strong>Payment &amp; Inventory:</strong> Stripe webhooks paired with database transactions for immediate dispatch notification.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 08 RESULTS / DELIVERED CAPABILITIES -->
+        <div class="case-section-block">
+          <div class="case-section-tag">08 — RESULTS &amp; CAPABILITIES</div>
+          <h2 class="case-section-heading">Operational Capabilities Delivered</h2>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:12px;margin:20px 0;">
+            <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary);">
+              <span style="color:#10b981;font-weight:bold;">✓</span> 70% decrease in average image payload weights across mobile devices.
+            </li>
+            <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary);">
+              <span style="color:#10b981;font-weight:bold;">✓</span> Zero cart abandonment caused by slow checkout redirect transitions.
+            </li>
+            <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary);">
+              <span style="color:#10b981;font-weight:bold;">✓</span> Frictionless multi-device checkout with biometric 1-click payment support.
+            </li>
+          </ul>
+        </div>
+
+        <!-- 09 NEXT PROJECT CTA -->
+        <div class="case-section-block" style="text-align:center;padding:48px 24px;background:var(--bg-card);border:1px solid var(--border-glow);border-radius:var(--radius-xl);margin-top:60px;">
+          <div class="case-section-tag">09 — NEXT PROJECT</div>
+          <h3 style="font-size:1.8rem;font-weight:800;margin-bottom:12px;">Looking to Build a High-Performance Digital Product?</h3>
+          <p style="color:var(--text-secondary);max-width:540px;margin:0 auto 28px;font-size:1rem;">
+            Whether you need modern e-commerce architecture, a custom SaaS platform, or AI workflow integration, we engineer solutions designed to compete globally.
+          </p>
+          <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+            <a href="../contact.html" class="btn btn-primary btn-lg">Start a Project</a>
+            <a href="../work.html" class="btn btn-ghost btn-lg">View All Projects</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-bottom-bar" style="border-top:none;padding-top:0;">
+        <div>© 2026 SHAIVIKA IT TECHNOLOGIES. All rights reserved.</div>
+        <div class="footer-bottom-links">
+          <a href="../privacy.html">Privacy Policy</a>
+          <a href="../terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.min.js?v=2026" defer></script>
+</body>
+
+</html>

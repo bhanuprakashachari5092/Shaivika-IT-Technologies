@@ -7,13 +7,12 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <script>
-    (function() {
-      const theme = localStorage.getItem('theme') || 'light';
-      if (theme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
+    (function () {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
     })();
   </script>
+
   <title>Careers & Job Openings | Shaivika IT Technologies</title>
   <meta name="description" content="Join Shaivika IT Technologies. Explore career opportunities in AI automation, software engineering, and web development. Build the future of technology with us." />
   <meta name="keywords" content="Shaivika IT Technologies careers, IT jobs India, software engineering jobs, AI jobs, tech careers" />
@@ -71,6 +70,7 @@
   }
   </script>
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dwv8kc9vb/image/upload/f_auto,q_auto,w_600/v1782199061/ChatGPT_Image_Jun_23_2026_12_47_21_PM_upsrdk.png" />
+  <link rel="icon" type="image/webp" href="img/favicon.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;700&display=swap" rel="stylesheet" />
