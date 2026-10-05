@@ -2811,6 +2811,693 @@ footer {
   color: #1d4ed8;
 }
 
+
+/* ==========================================================================
+   SECTION 1: WHO WE BUILD FOR (AUDIENCE CARDS)
+   ========================================================================== */
+.who-we-build-for-section {
+  padding: 96px 0;
+  position: relative;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.audience-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.audience-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.audience-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-accent);
+  opacity: 0;
+  transition: opacity var(--transition-smooth);
+}
+
+.audience-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-glow);
+  box-shadow: var(--shadow-md), 0 0 24px rgba(37, 99, 235, 0.12);
+  background: var(--bg-card-hover);
+}
+
+.audience-card:hover::before {
+  opacity: 1;
+}
+
+.audience-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.audience-number {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+}
+
+.audience-visual {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--electric-blue);
+  transition: all var(--transition-fast);
+}
+
+.audience-card:hover .audience-visual {
+  transform: scale(1.08);
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary-light);
+  box-shadow: 0 4px 14px var(--primary-glow);
+}
+
+.audience-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  letter-spacing: -0.015em;
+}
+
+.audience-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 22px;
+  flex-grow: 1;
+}
+
+.audience-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.audience-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.2px;
+  transition: all var(--transition-fast);
+}
+
+.audience-card:hover .audience-tag {
+  border-color: rgba(59, 130, 246, 0.25);
+  color: var(--text-primary);
+}
+
+.audience-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--electric-blue);
+  transition: all var(--transition-fast);
+  margin-top: auto;
+}
+
+.audience-cta svg {
+  transition: transform var(--transition-fast);
+}
+
+.audience-card:hover .audience-cta {
+  color: var(--primary-light);
+}
+
+.audience-card:hover .audience-cta svg {
+  transform: translateX(4px);
+}
+
+@media (max-width: 1024px) {
+  .audience-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .audience-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .audience-card {
+    padding: 24px 20px;
+  }
+}
+
+/* ==========================================================================
+   SECTION 2: WHY SHAIVIKA (SPLIT ARCHITECTURE + PRINCIPLES)
+   ========================================================================== */
+.why-shaivika-section {
+  padding: 96px 0;
+  position: relative;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.why-shaivika-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.why-principles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 32px;
+}
+
+.principle-item {
+  display: flex;
+  gap: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  transition: all var(--transition-smooth);
+  position: relative;
+}
+
+.principle-item:hover {
+  border-color: var(--border-glow);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm), 0 0 20px rgba(37, 99, 235, 0.08);
+}
+
+.principle-num {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--electric-blue);
+  line-height: 1;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.principle-info h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.principle-info p {
+  font-size: 0.885rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Elegant Architecture Visual: BUSINESS -> PRODUCT -> ENGINEERING + AI -> OUTCOME */
+.why-flow-panel {
+  width: 100%;
+}
+
+.why-flow-stage {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: 34px 28px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.flow-ambient-glow {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  right: 15%;
+  bottom: 15%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, rgba(56, 189, 248, 0.08) 50%, transparent 70%);
+  filter: blur(48px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.flow-nodes-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.flow-node-box {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.flow-node-box:hover {
+  border-color: var(--border-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.node-outcome-box {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+[data-theme="dark"] .node-outcome-box {
+  background: rgba(16, 185, 129, 0.06);
+}
+
+[data-theme="light"] .node-outcome-box {
+  background: #f0fdf4;
+}
+
+.flow-node-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-business {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.icon-product {
+  background: rgba(37, 99, 235, 0.12);
+  color: #3b82f6;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+.icon-engineering {
+  background: rgba(124, 58, 237, 0.12);
+  color: #a855f7;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+.icon-outcome {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.flow-node-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.flow-node-tag {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.flow-node-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.flow-node-desc {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+/* Animated Connecting Lines between Nodes */
+.flow-connector {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  width: 100%;
+}
+
+.flow-line {
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--border-glow), var(--primary));
+  position: relative;
+  opacity: 0.7;
+}
+
+.flow-pulse {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8, 0 0 4px #fff;
+  top: 0;
+  animation: flowPulseAnim 2.4s infinite ease-in-out;
+}
+
+.pulse-2 { animation-delay: 0.8s; }
+.pulse-3 { animation-delay: 1.6s; }
+
+.flow-arrow-icon {
+  position: absolute;
+  bottom: -4px;
+  color: var(--primary-light);
+}
+
+@keyframes flowPulseAnim {
+  0% { top: 0; opacity: 0; transform: scale(0.6); }
+  25% { opacity: 1; transform: scale(1.2); }
+  75% { opacity: 1; transform: scale(1); }
+  100% { top: 100%; opacity: 0; transform: scale(0.6); }
+}
+
+@media (max-width: 992px) {
+  .why-shaivika-layout {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+@media (max-width: 640px) {
+  .principle-item {
+    padding: 18px 16px;
+    gap: 14px;
+  }
+  .why-flow-stage {
+    padding: 24px 18px;
+  }
+}
+
+/* ==========================================================================
+   SECTION 3: FROM IDEA TO PRODUCTION (TIMELINE + CTA)
+   ========================================================================== */
+.process-section {
+  padding: 96px 0 88px;
+  position: relative;
+  background: var(--bg-primary);
+}
+
+/* Desktop Horizontal Timeline Track */
+.timeline-track-desktop {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  margin-top: 56px;
+}
+
+.timeline-track-line {
+  position: absolute;
+  top: 42px;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: var(--border-subtle);
+  z-index: 0;
+}
+
+.timeline-track-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #38bdf8 0%, #2563eb 50%, #7c3aed 100%);
+  border-radius: 2px;
+  transform-origin: left;
+}
+
+.timeline-step-card {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-smooth);
+}
+
+.timeline-step-card:hover {
+  border-color: var(--border-glow);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md), 0 0 24px rgba(37, 99, 235, 0.1);
+  background: var(--bg-card-hover);
+}
+
+.timeline-step-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 18px;
+}
+
+.timeline-step-num {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--electric-blue);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.timeline-step-card.step-active .timeline-step-num,
+.timeline-step-card:hover .timeline-step-num {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 14px var(--primary-glow);
+}
+
+.timeline-mobile-item.step-active::before {
+  background: var(--primary-light);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.timeline-step-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+.timeline-step-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Mobile Vertical Timeline */
+@media (max-width: 900px) {
+  .timeline-track-desktop {
+    display: none;
+  }
+}
+
+.timeline-track-mobile {
+  display: none;
+  position: relative;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 36px;
+}
+
+@media (max-width: 900px) {
+  .timeline-track-mobile {
+    display: flex;
+    padding-left: 22px;
+    border-left: 2px solid var(--border-glow);
+    margin-left: 14px;
+  }
+}
+
+.timeline-mobile-item {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px 18px;
+  transition: all var(--transition-fast);
+}
+
+.timeline-mobile-item::before {
+  content: '';
+  position: absolute;
+  left: -29px;
+  top: 24px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--electric-blue);
+  border: 2px solid var(--bg-primary);
+  box-shadow: 0 0 8px var(--electric-blue);
+}
+
+.timeline-mobile-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.timeline-mobile-num {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--electric-blue);
+  background: rgba(37, 99, 235, 0.12);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.timeline-mobile-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.timeline-mobile-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Immediate CTA Banner after Process */
+.process-cta-banner {
+  margin-top: 56px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: 40px 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .process-cta-banner {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.14) 0%, rgba(124, 58, 237, 0.08) 100%), var(--bg-card);
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: var(--shadow-md), 0 0 35px rgba(37, 99, 235, 0.12);
+}
+
+[data-theme="light"] .process-cta-banner {
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+  border-color: #bfdbfe;
+  box-shadow: var(--shadow-md), 0 8px 24px rgba(37, 99, 235, 0.08);
+}
+
+.process-cta-content {
+  max-width: 580px;
+}
+
+.process-cta-title {
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.process-cta-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.process-cta-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .process-cta-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 32px 24px;
+    gap: 22px;
+  }
+  .process-cta-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .process-cta-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* ==========================================================================
    MASTER MOBILE RESPONSIVENESS & TOUCH ERGONOMICS (320px - 768px)
    ========================================================================== */

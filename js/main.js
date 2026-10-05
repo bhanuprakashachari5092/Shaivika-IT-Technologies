@@ -338,6 +338,22 @@
     }
   }
 
+  // ===== 9. TIMELINE PROGRESS & STEP OBSERVER =====
+  function initTimelineObserver() {
+    const steps = document.querySelectorAll('.timeline-step-card, .timeline-mobile-item');
+    if (!steps.length) return;
+
+    const timelineObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('step-active');
+        }
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -20px 0px' });
+
+    steps.forEach(step => timelineObserver.observe(step));
+  }
+
   // ===== INITIALIZE ALL =====
   initPreloader();
   document.addEventListener('DOMContentLoaded', () => {
@@ -347,5 +363,6 @@
     initCounters();
     initHeroDashboard();
     initContactForm();
+    initTimelineObserver();
   });
 })();
