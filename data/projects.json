@@ -1,0 +1,76 @@
+[
+  {
+    "slug": "kaizenq",
+    "title": "KaizenQ",
+    "subtitle": "AI-Powered Learning Management Platform",
+    "category": "SaaS / AI / EdTech",
+    "description": "KaizenQ is a modern learning platform combining course management, assessments, analytics, certificates, and AI-powered learning assistance in one connected experience.",
+    "capabilities": [
+      "Course Management",
+      "AI Mentor",
+      "Assessments & Quizzes",
+      "Student Analytics",
+      "Certificates",
+      "Admin Dashboard",
+      "Learning Content",
+      "Student Management"
+    ],
+    "technologies": [
+      "React",
+      "Vite",
+      "Node.js",
+      "PostgreSQL",
+      "Google Gemini AI"
+    ],
+    "image": "img/kaizenq-preview.webp",
+    "route": "work/kaizenq.html",
+    "featured": true
+  },
+  {
+    "slug": "smr-car-travels",
+    "title": "SMR Car Travels",
+    "subtitle": "Modern Travel & Business Website",
+    "category": "Web Development / Business",
+    "description": "A responsive business website designed to present travel services, build trust, and make it easier for customers to connect with the business.",
+    "capabilities": [
+      "Responsive Design",
+      "Service Presentation",
+      "Contact / Lead Flow",
+      "Mobile-first Experience",
+      "Business Information Architecture"
+    ],
+    "technologies": [
+      "HTML5",
+      "CSS3",
+      "JavaScript",
+      "Cloudinary"
+    ],
+    "image": "img/smr-preview.webp",
+    "route": "work/smr-car-travels.html",
+    "featured": false
+  },
+  {
+    "slug": "textile-ecommerce",
+    "title": "Luxury Textile & E-Commerce",
+    "subtitle": "Premium Digital Commerce Experience",
+    "category": "E-Commerce / Retail",
+    "description": "A premium e-commerce experience designed around product presentation, catalog browsing, responsive shopping experiences, and cloud-based media.",
+    "capabilities": [
+      "Product Catalogue",
+      "Product Presentation",
+      "Responsive UI",
+      "Cloud Media",
+      "E-Commerce Architecture"
+    ],
+    "technologies": [
+      "React",
+      "Next.js",
+      "Node.js",
+      "Cloudinary",
+      "Stripe APIs"
+    ],
+    "image": "img/textile-preview.webp",
+    "route": "work/textile-ecommerce.html",
+    "featured": false
+  }
+]
