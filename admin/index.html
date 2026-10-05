@@ -938,7 +938,7 @@
                     <span class="sidebar-link" data-tab="category-manager-tab">🏷️ Categories</span>
                 </li>
                 <li class="sidebar-item">
-                    <span class="sidebar-link" data-tab="leads-manager-tab">✉️ Form Submissions</span>
+                    <span class="sidebar-link" data-tab="leads-manager-tab">✉️ Leads</span>
                 </li>
                 <li class="sidebar-item">
                     <span class="sidebar-link" data-tab="jobs-manager-tab">👔 Job Openings</span>
@@ -1119,7 +1119,18 @@
             <section class="tab-content" id="leads-manager-tab">
                 <div class="data-card">
                     <div class="data-card-header">
-                        <input type="text" class="search-input" id="searchLeads" placeholder="Search leads by name, email, msg...">
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                            <input type="text" class="search-input" id="searchLeads" placeholder="Search leads by name, email, company, project...">
+                            <select class="form-select" id="filterLeadStatus" style="width:auto; padding:8px 14px; background:rgba(255,255,255,0.04); color:var(--text-primary); border:1px solid var(--border-glass); border-radius:10px; font-size:0.85rem;">
+                                <option value="all">All Statuses</option>
+                                <option value="new">New</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="qualified">Qualified</option>
+                                <option value="proposal">Proposal</option>
+                                <option value="won">Won</option>
+                                <option value="lost">Lost</option>
+                            </select>
+                        </div>
                         <div style="display: flex; gap: 8px;">
                             <button class="btn btn-secondary btn-sm" id="exportLeadsCsv">Export CSV</button>
                             <button class="btn btn-secondary btn-sm" id="exportLeadsJson">Export JSON</button>
@@ -1129,11 +1140,13 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
+                                    <th>Created Date</th>
                                     <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Subject</th>
+                                    <th>Company</th>
+                                    <th>Country</th>
+                                    <th>Project Type</th>
+                                    <th>Budget</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -2836,37 +2849,85 @@
         };
 
         // LEADS TABLE
-        const renderLeadsTable = (searchQuery = '') => {
+        window.updateLeadStatus = (leadId, newStatus) => {
+            const sub = database.submissions.find(s => s.id === leadId);
+            if (sub) {
+                sub.status = newStatus;
+                sub.updatedAt = new Date().toISOString();
+                saveData();
+                showToast(`Lead status updated to: ${newStatus.toUpperCase()}`, 'success');
+                renderLeadsTable(document.getElementById('searchLeads')?.value || '', document.getElementById('filterLeadStatus')?.value || 'all');
+            }
+        };
+
+        const renderLeadsTable = (searchQuery = '', statusFilter = 'all') => {
             const tbody = document.getElementById('leadsTableBody');
             tbody.innerHTML = '';
-            let filtered = [...database.submissions].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+            let filtered = [...database.submissions].sort((a,b) => new Date(b.createdAt || b.timestamp) - new Date(a.createdAt || a.timestamp));
+
+            if (statusFilter && statusFilter !== 'all') {
+                filtered = filtered.filter(l => (l.status || 'new').toLowerCase() === statusFilter.toLowerCase());
+            }
+
             if (searchQuery) {
                 const q = searchQuery.toLowerCase();
-                filtered = filtered.filter(l => l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q));
+                filtered = filtered.filter(l => 
+                    (l.name || '').toLowerCase().includes(q) || 
+                    (l.email || '').toLowerCase().includes(q) || 
+                    (l.company || '').toLowerCase().includes(q) ||
+                    (l.country || '').toLowerCase().includes(q) ||
+                    (l.projectType || l.type || '').toLowerCase().includes(q) ||
+                    (l.description || l.message || '').toLowerCase().includes(q)
+                );
             }
+
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding:24px;">No form submissions.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding:28px;">No leads found.</td></tr>';
                 return;
             }
+
+            const getStatusBadgeColor = (status) => {
+                const s = (status || 'new').toLowerCase();
+                if (s === 'new') return '#38bdf8';
+                if (s === 'contacted') return '#f59e0b';
+                if (s === 'qualified') return '#a855f7';
+                if (s === 'proposal') return '#6366f1';
+                if (s === 'won') return '#10b981';
+                if (s === 'lost') return '#ef4444';
+                return '#94a3b8';
+            };
+
             filtered.forEach(sub => {
                 const tr = document.createElement('tr');
-                const date = new Date(sub.timestamp).toLocaleString();
-                const typeTag = sub.type === 'Newsletter' ? 'tag-purple' : 'tag-blue';
+                const date = new Date(sub.createdAt || sub.timestamp).toLocaleDateString();
+                const curStatus = (sub.status || 'new').toLowerCase();
+
                 tr.innerHTML = `
-                    <td>${escapeHTML(date)}</td>
-                    <td><span class="tag ${typeTag}">${escapeHTML(sub.type)}</span></td>
-                    <td>${escapeHTML(sub.name)}</td>
-                    <td>${escapeHTML(sub.email)}</td>
-                    <td>${escapeHTML(sub.subject)}</td>
+                    <td style="white-space:nowrap; font-size:0.82rem; color:var(--text-secondary);">${escapeHTML(date)}</td>
+                    <td style="font-weight:600; color:var(--text-primary);">${escapeHTML(sub.name || 'Anonymous')}</td>
+                    <td style="color:var(--text-secondary);">${escapeHTML(sub.company || '—')}</td>
+                    <td style="color:var(--text-secondary);">${escapeHTML(sub.country || '—')}</td>
+                    <td><span class="tag tag-blue" style="font-size:0.75rem;">${escapeHTML(sub.projectType || sub.type || 'General')}</span></td>
+                    <td style="font-weight:600; color:var(--text-primary); font-size:0.85rem;">${escapeHTML(sub.budget || '—')}</td>
+                    <td>
+                        <select onchange="window.updateLeadStatus('${escapeHTML(sub.id)}', this.value)" style="padding:4px 8px; font-size:0.78rem; font-weight:600; border-radius:6px; background:rgba(255,255,255,0.05); color:${getStatusBadgeColor(curStatus)}; border:1px solid ${getStatusBadgeColor(curStatus)}50; cursor:pointer;">
+                            <option value="new" ${curStatus === 'new' ? 'selected' : ''}>New</option>
+                            <option value="contacted" ${curStatus === 'contacted' ? 'selected' : ''}>Contacted</option>
+                            <option value="qualified" ${curStatus === 'qualified' ? 'selected' : ''}>Qualified</option>
+                            <option value="proposal" ${curStatus === 'proposal' ? 'selected' : ''}>Proposal</option>
+                            <option value="won" ${curStatus === 'won' ? 'selected' : ''}>Won</option>
+                            <option value="lost" ${curStatus === 'lost' ? 'selected' : ''}>Lost</option>
+                        </select>
+                    </td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View Submission" onclick="viewLeadDetails('${escapeHTML(sub.id)}')">
+                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View Lead Details" onclick="viewLeadDetails('${escapeHTML(sub.id)}')">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Submission" onclick="editLeadDetails('${escapeHTML(sub.id)}')">
+                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Lead" onclick="editLeadDetails('${escapeHTML(sub.id)}')">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Submission" onclick="confirmDeleteLead('${escapeHTML(sub.id)}')">
+                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Lead" onclick="confirmDeleteLead('${escapeHTML(sub.id)}')">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -2876,8 +2937,61 @@
             });
         };
 
-        document.getElementById('searchLeads').addEventListener('input', (e) => {
-            renderLeadsTable(e.target.value);
+        document.getElementById('searchLeads')?.addEventListener('input', (e) => {
+            renderLeadsTable(e.target.value, document.getElementById('filterLeadStatus')?.value || 'all');
+        });
+
+        document.getElementById('filterLeadStatus')?.addEventListener('change', (e) => {
+            renderLeadsTable(document.getElementById('searchLeads')?.value || '', e.target.value);
+        });
+
+        // Leads Export CSV
+        document.getElementById('exportLeadsCsv')?.addEventListener('click', () => {
+            if (!database.submissions || !database.submissions.length) {
+                showToast('No leads available to export.', 'error');
+                return;
+            }
+            const headers = ['ID', 'Date', 'Name', 'Email', 'Company', 'Country', 'Phone', 'Contact Method', 'Project Type', 'Budget', 'Launch Date', 'Status', 'Description'];
+            const rows = database.submissions.map(s => [
+                s.id || '',
+                s.createdAt || s.timestamp || '',
+                `"${(s.name || '').replace(/"/g, '""')}"`,
+                `"${(s.email || '').replace(/"/g, '""')}"`,
+                `"${(s.company || '').replace(/"/g, '""')}"`,
+                `"${(s.country || '').replace(/"/g, '""')}"`,
+                `"${(s.phone || '').replace(/"/g, '""')}"`,
+                `"${(s.contactMethod || '').replace(/"/g, '""')}"`,
+                `"${(s.projectType || s.type || '').replace(/"/g, '""')}"`,
+                `"${(s.budget || '').replace(/"/g, '""')}"`,
+                `"${(s.launchDate || '').replace(/"/g, '""')}"`,
+                `"${(s.status || 'new').replace(/"/g, '""')}"`,
+                `"${(s.description || s.message || '').replace(/"/g, '""')}"`
+            ]);
+            const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `shaivika_leads_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            showToast('Leads CSV exported successfully.', 'success');
+        });
+
+        // Leads Export JSON
+        document.getElementById('exportLeadsJson')?.addEventListener('click', () => {
+            if (!database.submissions || !database.submissions.length) {
+                showToast('No leads available to export.', 'error');
+                return;
+            }
+            const jsonStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(database.submissions, null, 2));
+            const link = document.createElement('a');
+            link.setAttribute('href', jsonStr);
+            link.setAttribute('download', `shaivika_leads_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            showToast('Leads JSON exported successfully.', 'success');
         });
 
         // JOBS MANAGEMENT TABLE
@@ -4126,11 +4240,37 @@
         window.viewLeadDetails = (id) => {
             const sub = database.submissions.find(s => s.id === id);
             if (!sub) return;
+            const statusColor = (status) => {
+                const s = (status || 'new').toLowerCase();
+                if (s === 'new') return '#38bdf8';
+                if (s === 'contacted') return '#f59e0b';
+                if (s === 'qualified') return '#a855f7';
+                if (s === 'proposal') return '#6366f1';
+                if (s === 'won') return '#10b981';
+                if (s === 'lost') return '#ef4444';
+                return '#94a3b8';
+            };
+            const phoneVal = sub.phone ? `<a href="https://wa.me/${escapeHTML(sub.phone.replace(/[^0-9]/g, ''))}" target="_blank" style="color:#10b981; font-weight:600;">${escapeHTML(sub.phone)} ↗</a>` : '<span style="color:var(--text-muted);">Not Provided</span>';
+
             document.getElementById('leadModalBody').innerHTML = `
-                <div class="lead-detail-field"><div class="lead-detail-label">Name</div><div class="lead-detail-value">${escapeHTML(sub.name)}</div></div>
-                <div class="lead-detail-field"><div class="lead-detail-label">Email</div><div class="lead-detail-value">${escapeHTML(sub.email)}</div></div>
-                <div class="lead-detail-field"><div class="lead-detail-label">Subject</div><div class="lead-detail-value">${escapeHTML(sub.subject)}</div></div>
-                <div class="lead-detail-field"><div class="lead-detail-label">Message</div><div class="lead-detail-value" style="white-space:pre-wrap;">${escapeHTML(sub.message)}</div></div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:18px;">
+                    <div class="lead-detail-field"><div class="lead-detail-label">Full Name</div><div class="lead-detail-value" style="font-weight:700; color:var(--text-primary); font-size:1.05rem;">${escapeHTML(sub.name || 'Anonymous')}</div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Work Email</div><div class="lead-detail-value"><a href="mailto:${escapeHTML(sub.email)}" style="color:var(--accent); font-weight:600;">${escapeHTML(sub.email)}</a></div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Company</div><div class="lead-detail-value">${escapeHTML(sub.company || 'Not Specified')}</div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Country</div><div class="lead-detail-value">${escapeHTML(sub.country || 'Not Specified')}</div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Phone / WhatsApp</div><div class="lead-detail-value">${phoneVal}</div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Contact Method</div><div class="lead-detail-value">${escapeHTML(sub.contactMethod || 'Email')}</div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Project Type</div><div class="lead-detail-value"><span class="tag tag-cyan">${escapeHTML(sub.projectType || sub.type || 'General')}</span></div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Budget Range</div><div class="lead-detail-value" style="color:var(--success); font-weight:700;">${escapeHTML(sub.budget || 'TBD')}</div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Target Launch Date</div><div class="lead-detail-value">${escapeHTML(sub.launchDate || 'Flexible')}</div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Current Status</div><div class="lead-detail-value"><span style="display:inline-block; padding:3px 10px; border-radius:6px; font-size:0.8rem; font-weight:700; color:${statusColor(sub.status)}; background:${statusColor(sub.status)}20; border:1px solid ${statusColor(sub.status)}40;">${escapeHTML((sub.status || 'New').toUpperCase())}</span></div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Submitted At</div><div class="lead-detail-value" style="font-size:0.85rem; color:var(--text-secondary);">${new Date(sub.createdAt || sub.timestamp).toLocaleString()}</div></div>
+                    <div class="lead-detail-field"><div class="lead-detail-label">Lead Source</div><div class="lead-detail-value"><code style="font-size:0.78rem; color:var(--cyan);">${escapeHTML(sub.source || 'website-contact-form')}</code></div></div>
+                </div>
+                <div class="lead-detail-field">
+                    <div class="lead-detail-label">Project Description</div>
+                    <div class="lead-detail-value" style="white-space:pre-wrap; background:rgba(0,0,0,0.25); padding:16px; border-radius:10px; border:1px solid var(--border-glass); line-height:1.65; color:var(--text-primary); font-size:0.92rem;">${escapeHTML(sub.description || sub.message || 'No description provided.')}</div>
+                </div>
             `;
             leadModal.classList.add('open');
             document.body.style.overflow = 'hidden';

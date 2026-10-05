@@ -86,3 +86,13 @@
   from = "/work/textile-ecommerce"
   to = "/work/textile-ecommerce.html"
   status = 200
+
+# Backend Leads API Endpoint
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/leads"
+  to = "/.netlify/functions/leads"
+  status = 200
+

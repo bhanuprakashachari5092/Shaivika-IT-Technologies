@@ -2205,8 +2205,9 @@ section {
 /* ===== CONTACT & LEAD GENERATION ===== */
 .contact-section-layout {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 60px;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 56px;
+  align-items: start;
 }
 
 .contact-info-col {
@@ -2214,10 +2215,26 @@ section {
   flex-direction: column;
 }
 
+.contact-trust-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: -12px;
+  margin-bottom: 28px;
+  padding: 12px 18px;
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--electric-blue);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  line-height: 1.5;
+}
+
 .contact-channel-item {
   display: flex;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
   align-items: flex-start;
 }
 
@@ -2238,6 +2255,7 @@ section {
   font-size: 0.95rem;
   font-weight: 700;
   margin-bottom: 4px;
+  color: var(--text-primary);
 }
 
 .channel-details p, .channel-details a {
@@ -2249,53 +2267,287 @@ section {
   color: var(--electric-blue);
 }
 
+/* Trust Sidebar: What Happens Next */
+.trust-sidebar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  margin-top: 16px;
+  backdrop-filter: blur(12px);
+}
+
+.trust-sidebar-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--electric-blue);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trust-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.trust-step-item {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.trust-step-num {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--electric-blue);
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.trust-step-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+/* Form Container */
 .contact-form-wrapper {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  padding: 44px;
+  padding: 40px;
   backdrop-filter: blur(20px);
+  position: relative;
+  box-shadow: var(--shadow-md);
+}
+
+.contact-form-intro {
+  margin-bottom: 24px;
+}
+
+.contact-form-intro h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.contact-form-intro p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 .form-grid-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 18px;
+  margin-bottom: 18px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: 7px;
+  margin-bottom: 18px;
+  position: relative;
 }
 
 .form-group label {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .form-input, .form-select, .form-textarea {
   background: var(--bg-input);
   border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
-  padding: 13px 18px;
+  padding: 12px 16px;
+  min-height: 46px; /* Touch target >= 44px */
   color: var(--text-primary);
-  font-size: 0.9375rem;
-  transition: all var(--transition-fast);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
   width: 100%;
+  box-sizing: border-box;
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg2+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+[data-theme="light"] .form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
   border-color: var(--primary-light);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
 .form-textarea {
-  min-height: 130px;
+  min-height: 120px;
   resize: vertical;
+  line-height: 1.5;
+}
+
+/* Character Count */
+.char-count-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.char-count-wrap.near-limit {
+  color: var(--warning);
+}
+
+.char-count-wrap.over-limit {
+  color: var(--error);
+  font-weight: 700;
+}
+
+/* Inline Accessible Field Errors */
+.field-error {
+  display: none;
+  font-size: 0.8rem;
+  color: var(--error);
+  margin-top: 4px;
+  line-height: 1.35;
+  align-items: center;
+  gap: 5px;
+}
+
+.form-group.has-error .field-error {
+  display: flex;
+}
+
+.form-group.has-error .form-input,
+.form-group.has-error .form-select,
+.form-group.has-error .form-textarea {
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18) !important;
+}
+
+/* Direct Contact Fallback */
+.direct-contact-fallback {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 0.88rem;
+}
+
+.fallback-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.fallback-item a {
+  color: var(--electric-blue);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.fallback-item a:hover {
+  color: var(--primary-light);
+}
+
+/* Premium Success & Error States */
+.contact-success-state,
+.contact-error-state {
+  display: none;
+  text-align: center;
+  padding: 44px 24px;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-state-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-success-state .contact-state-icon {
+  background: rgba(16, 185, 129, 0.12);
+  border: 2px solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
+}
+
+.contact-error-state .contact-state-icon {
+  background: rgba(239, 68, 68, 0.12);
+  border: 2px solid rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.contact-state-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.contact-state-message {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 520px;
+  margin: 0 auto 16px;
+}
+
+.contact-state-next {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  max-width: 520px;
+  margin: 0 auto 28px;
+}
+
+.contact-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
 }
 
 @media (max-width: 992px) {
@@ -2317,10 +2569,16 @@ section {
   .form-input, .form-select, .form-textarea {
     font-size: 16px; /* Prevents iOS Safari auto-zoom */
     padding: 12px 14px;
+    min-height: 48px;
   }
   .contact-form-wrapper .btn {
     width: 100%;
     justify-content: center;
+  }
+  .direct-contact-fallback {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }
 
@@ -2335,6 +2593,9 @@ section {
   .contact-channel-item {
     gap: 12px;
     margin-bottom: 18px;
+  }
+  .trust-sidebar-card {
+    padding: 20px 16px;
   }
 }
 
