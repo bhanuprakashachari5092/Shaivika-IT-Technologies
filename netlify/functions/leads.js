@@ -1,28 +1,32 @@
 /**
- * SHAIVIKA IT TECHNOLOGIES - SECURE LEAD SUBMISSION ENDPOINT
+ * SHAIVIKA IT TECHNOLOGIES — SECURE LEAD SUBMISSION ENDPOINT
  * POST /api/leads -> netlify/functions/leads.js
  *
+ * Architecture:
+ * Client Form -> POST /api/leads -> Validation -> Honeypot -> Rate Limiting -> Duplicate Prevention -> Supabase PostgreSQL -> Lead ID -> Email Notification
+ *
  * Implements:
- * - Method restriction (POST only)
- * - In-memory IP rate limiting
+ * - Method restriction (POST only, 405 Method Not Allowed)
  * - Anti-spam honeypot detection
+ * - Client IP rate limiting
  * - Server-side validation & sanitization
- * - Server-generated timestamps & unique IDs
- * - Lead storage persistence
- * - Email notification interface (via environment variables)
- * - Zero secrets or stack traces exposed
+ * - Normalization of email (lowercase, trimmed)
+ * - Server-controlled metadata (source='website', status='New')
+ * - Duplicate prevention (10-minute recent window by normalized email)
+ * - Supabase PostgreSQL persistence via Service Role (RLS secured)
+ * - Email notification dispatched AFTER successful database insert
+ * - Zero database secrets or stack traces exposed
  */
 
-const fs = require('fs');
-const path = require('path');
+const { isSupabaseConfigured, insertLead, checkDuplicateLead, hashIp } = require('./utils/supabase');
 
-// Simple in-memory rate limiter: IP -> timestamps array
+// Simple in-memory sliding window rate limiter
 const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_REQUESTS_PER_WINDOW = 5;
 
 function isRateLimited(ip) {
-  if (!ip) return false;
+  if (!ip || ip === 'unknown') return false;
   const now = Date.now();
   const timestamps = rateLimitMap.get(ip) || [];
   const validTimestamps = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
@@ -35,7 +39,7 @@ function isRateLimited(ip) {
   return false;
 }
 
-// Clean periodic memory cleanup
+// Memory cleanup
 const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [ip, timestamps] of rateLimitMap.entries()) {
@@ -52,13 +56,23 @@ if (cleanupTimer.unref) cleanupTimer.unref();
 function sanitizeString(str, maxLength = 255) {
   if (typeof str !== 'string') return '';
   return str
-    .replace(/[<>]/g, '') // Strip angle brackets to prevent script injection
+    .replace(/[<>]/g, '') // Strip HTML tags to prevent XSS
     .trim()
     .slice(0, maxLength);
 }
 
+function parseLaunchDate(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return null;
+  const trimmed = dateStr.trim();
+  // Valid ISO date YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const d = new Date(trimmed);
+    if (!isNaN(d.getTime())) return trimmed;
+  }
+  return null;
+}
+
 exports.handler = async (event, context) => {
-  // CORS Headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -66,6 +80,7 @@ exports.handler = async (event, context) => {
     'Content-Type': 'application/json; charset=utf-8'
   };
 
+  // CORS Preflight
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 204,
@@ -74,6 +89,7 @@ exports.handler = async (event, context) => {
     };
   }
 
+  // Method restriction
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -81,6 +97,18 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: false,
         message: 'Method Not Allowed. Use POST.'
+      })
+    };
+  }
+
+  // Payload size guard (50 KB max)
+  if (event.body && event.body.length > 50 * 1024) {
+    return {
+      statusCode: 413,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: 'Payload too large.'
       })
     };
   }
@@ -118,7 +146,6 @@ exports.handler = async (event, context) => {
 
   // 1. Anti-spam Honeypot Check
   if (body.website_hp_check || body.honeypot) {
-    // Silent rejection or 400 for bot trapping
     return {
       statusCode: 400,
       headers,
@@ -129,16 +156,18 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // 2. Server-side Validation
+  // 2. Server-side Validation & Sanitization
   const name = sanitizeString(body.name || body.fullName, 100);
-  const email = sanitizeString(body.email, 150);
+  const rawEmail = sanitizeString(body.email, 150);
+  const email = rawEmail.toLowerCase(); // Normalized to lowercase
   const company = sanitizeString(body.company, 100);
   const country = sanitizeString(body.country, 100);
   const phone = sanitizeString(body.phone, 40);
-  const contactMethod = sanitizeString(body.contactMethod || 'Email', 50);
-  const projectType = sanitizeString(body.projectType, 100);
+  const contactMethod = sanitizeString(body.contactMethod || body.contact_method || 'Email', 50);
+  const projectType = sanitizeString(body.projectType || body.project_type, 100);
   const budget = sanitizeString(body.budget, 100);
-  const launchDate = sanitizeString(body.launchDate, 60);
+  const rawLaunchDate = sanitizeString(body.launchDate || body.launch_date, 60);
+  const launchDate = parseLaunchDate(rawLaunchDate);
   const description = sanitizeString(body.description || body.message, 1000);
 
   // Validate Name (min 2 characters)
@@ -153,7 +182,7 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Validate Email
+  // Validate Email Format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email || !emailRegex.test(email)) {
     return {
@@ -214,52 +243,87 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // 3. Server-Generated Timestamp and Record
-  const serverTimestamp = new Date().toISOString();
-  const leadId = 'lead_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
-
-  const newLead = {
-    id: leadId,
-    name,
-    email,
-    company: company || '',
-    country,
-    phone: phone || '',
-    contactMethod: contactMethod || 'Email',
-    projectType,
-    budget,
-    launchDate: launchDate || '',
-    description,
-    source: 'website-contact-form',
-    status: 'new',
-    submittedAt: serverTimestamp,
-    createdAt: serverTimestamp,
-    updatedAt: serverTimestamp
-  };
-
-  // 4. Lead Storage (Local JSON persistence if accessible)
+  // 3. Duplicate Prevention (Check recent submission within 10 minutes)
   try {
-    const leadsFilePath = path.join(__dirname, '..', '..', 'data', 'leads.json');
-    if (fs.existsSync(leadsFilePath)) {
-      const raw = fs.readFileSync(leadsFilePath, 'utf8');
-      const leads = JSON.parse(raw || '[]');
-      leads.push(newLead);
-      fs.writeFileSync(leadsFilePath, JSON.stringify(leads, null, 2), 'utf8');
+    const existingDuplicate = await checkDuplicateLead(email, 10);
+    if (existingDuplicate) {
+      console.info(`[Leads API] Duplicate lead submission detected for ${email} (existing: ${existingDuplicate.id}). Returning user-friendly confirmation.`);
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          message: 'Thank you. Your project request has been received.',
+          leadId: existingDuplicate.id,
+          duplicate: true
+        })
+      };
     }
-  } catch (storageErr) {
-    // Serverless container file-system might be read-only on some cloud hosts;
-    // Client-side redundancy and Google Sheet webhooks handle external persistence.
-    console.warn('[Leads API] File system write skipped or read-only:', storageErr.message);
+  } catch (dupErr) {
+    console.warn('[Leads API] Duplicate check check failed non-critically:', dupErr.message);
   }
 
-  // 5. Notification Service Interface
-  // If SMTP/Resend environment variables are configured, dispatch notification
+  // 4. Prepare Record for Supabase PostgreSQL
+  // Append raw launch date text to description if not in strict YYYY-MM-DD format
+  let finalDescription = description;
+  if (rawLaunchDate && !launchDate) {
+    finalDescription += `\n[Target Timeline: ${rawLaunchDate}]`;
+  }
+
+  const leadRecord = {
+    name,
+    email,
+    company: company || null,
+    country,
+    phone: phone || null,
+    contact_method: contactMethod || 'Email',
+    project_type: projectType,
+    budget,
+    launch_date: launchDate,
+    description: finalDescription,
+    source: 'website',
+    status: 'New',
+    ip_hash: hashIp(clientIp),
+    user_agent: (event.headers['user-agent'] || '').substring(0, 200) || null
+  };
+
+  let savedLead;
+
+  // 5. Supabase Insertion
+  if (isSupabaseConfigured()) {
+    try {
+      savedLead = await insertLead(leadRecord);
+    } catch (dbErr) {
+      console.error('[Leads API] Supabase persistence error:', dbErr.message);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: "We couldn't submit your request right now. Please try again."
+        })
+      };
+    }
+  } else {
+    // When Supabase environment variables are missing (e.g. unconfigured local staging):
+    console.warn('[Leads API] SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set in environment.');
+    return {
+      statusCode: 503,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: 'Lead service configuration is currently being updated. Please contact shaivikagroups@gmail.com directly.'
+      })
+    };
+  }
+
+  // 6. Email Notification Interface (Dispatched AFTER Database Insertion)
+  // If email fails, the lead remains safely in Supabase.
   const verifiedBusinessEmail = 'shaivikagroups@gmail.com';
-  const notificationSubject = `New Project Inquiry — ${newLead.projectType}`;
+  const notificationSubject = `New Project Inquiry — ${savedLead.project_type || projectType}`;
 
   if (process.env.RESEND_API_KEY) {
     try {
-      // Clean interface for Resend
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -271,35 +335,38 @@ exports.handler = async (event, context) => {
           to: verifiedBusinessEmail,
           subject: notificationSubject,
           text: `
-Name: ${newLead.name}
-Email: ${newLead.email}
-Company: ${newLead.company || 'N/A'}
-Country: ${newLead.country}
-Project Type: ${newLead.projectType}
-Budget: ${newLead.budget}
-Launch Date: ${newLead.launchDate || 'N/A'}
-Contact Preference: ${newLead.contactMethod}
+New Lead Received:
+Name: ${savedLead.name}
+Email: ${savedLead.email}
+Company: ${savedLead.company || 'N/A'}
+Country: ${savedLead.country || 'N/A'}
+Project Type: ${savedLead.project_type || projectType}
+Budget: ${savedLead.budget || budget}
+Target Launch: ${rawLaunchDate || 'N/A'}
+Contact Preference: ${savedLead.contact_method || contactMethod}
 Description:
-${newLead.description}
+${savedLead.description}
+
+Lead ID: ${savedLead.id}
+Timestamp: ${savedLead.created_at || new Date().toISOString()}
           `.trim()
         })
       });
     } catch (emailErr) {
-      console.error('[Leads API] Notification dispatch error:', emailErr.message);
+      console.error('[Leads API] Email dispatch failed (Lead stored safely in Supabase):', emailErr.message);
     }
   } else {
-    // Documented interface: Ready for environment variables
-    console.info(`[Leads API] New lead received for ${newLead.name} (${newLead.projectType}). Email service ready via RESEND_API_KEY or SMTP env vars.`);
+    console.info(`[Leads API] Lead ${savedLead.id} stored in Supabase. Email notification skipped (RESEND_API_KEY not configured).`);
   }
 
-  // 6. Return Success Response
+  // 7. Return Safe Response (Never exposes internal database information)
   return {
     statusCode: 200,
     headers,
     body: JSON.stringify({
       success: true,
-      message: 'Project inquiry received successfully.',
-      leadId: newLead.id
+      message: 'Thank you. Your project request has been received.',
+      leadId: savedLead.id
     })
   };
 };

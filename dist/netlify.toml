@@ -96,3 +96,14 @@
   to = "/.netlify/functions/leads"
   status = 200
 
+[[redirects]]
+  from = "/api/admin/leads/*"
+  to = "/.netlify/functions/admin-leads"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/leads"
+  to = "/.netlify/functions/admin-leads"
+  status = 200
+
+

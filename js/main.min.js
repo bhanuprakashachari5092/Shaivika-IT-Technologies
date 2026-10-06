@@ -431,35 +431,11 @@
         website_hp_check: ''
       };
 
-      // Always save to LocalStorage (admin dashboard compatibility & zero data loss)
+      // Clear any temporary form draft from browser storage
       try {
-        const localLead = {
-          id: 'lead_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
-          type: 'Contact Form',
-          name: fullName,
-          email: email,
-          company: company || 'Not Specified',
-          country: country,
-          phone: phone || 'Not Provided',
-          contactMethod: contactMethod,
-          projectType: projectType,
-          budget: budget,
-          launchDate: launchDate || 'Flexible',
-          description: description,
-          subject: `${projectType} (${budget})`,
-          message: description,
-          source: 'website-contact-form',
-          status: 'new',
-          timestamp: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        const subs = JSON.parse(localStorage.getItem('shaivika_submissions') || '[]');
-        subs.push(localLead);
-        localStorage.setItem('shaivika_submissions', JSON.stringify(subs));
-      } catch (storageErr) {
-        console.warn('LocalStorage save error:', storageErr);
-      }
+        localStorage.removeItem('shaivika_contact_form_draft');
+      } catch (storageErr) {}
+
 
       // Secondary Google Sheet backup if configured
       const GAS_URL = "https://script.google.com/macros/s/AKfycbz2ryEdo__YgiFBkps9pj4kLw5vFW3Uhvv0lSGJ1SNP3uW3n6YXv5sJe077GPvWM4gVAA/exec";

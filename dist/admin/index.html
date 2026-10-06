@@ -1155,6 +1155,13 @@
                             </tbody>
                         </table>
                     </div>
+                    <div id="leadsPaginationControls" style="display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-top:1px solid var(--border-glass); font-size:0.85rem; color:var(--text-secondary); flex-wrap:wrap; gap:10px;">
+                        <span id="leadsPaginationInfo">Showing page 1 of 1</span>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-secondary btn-sm" id="leadsPrevPageBtn" disabled>← Previous</button>
+                            <button class="btn btn-secondary btn-sm" id="leadsNextPageBtn" disabled>Next →</button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -2388,6 +2395,7 @@
                 sessionStorage.removeItem('shaivika_admin_failed_attempts');
                 sessionStorage.removeItem('shaivika_admin_lockout');
                 localStorage.setItem('shaivika_admin_logged_in', 'true');
+                localStorage.setItem('shaivika_admin_token', pass || 'shaivika_admin_2026');
                 showToast('Login successful!', 'success');
                 checkAuth();
             } else {
@@ -2404,6 +2412,7 @@
 
         logoutBtn.addEventListener('click', () => {
             localStorage.removeItem('shaivika_admin_logged_in');
+            localStorage.removeItem('shaivika_admin_token');
             showToast('Logged out successfully.', 'success');
             checkAuth();
         });
@@ -2562,31 +2571,24 @@
                 database.projects = DEFAULT_FALLBACK_PROJECTS;
             }
 
-                // Submissions
+                // Submissions / Leads (Supabase backend with offline fallback)
                 try {
-                    const sheetUrl = 'https://docs.google.com/spreadsheets/d/19Sa9Bh6_cEs-oTUEPRRgQURpC5BaOwYfhaoF6nFBCMU/gviz/tq?tqx=out:json';
-                    const response = await fetch(sheetUrl).catch(() => null);
-                    if (response && response.ok) {
-                        const text = await response.text();
-                        const jsonStart = text.indexOf('{');
-                        const jsonEnd = text.lastIndexOf('}');
-                        if (jsonStart !== -1 && jsonEnd !== -1) {
-                            const jsonString = text.substring(jsonStart, jsonEnd + 1);
-                            const data = JSON.parse(jsonString);
-                            const rows = data.table && data.table.rows ? data.table.rows : [];
-                            
-                            database.submissions = rows.map((row, index) => {
-                                return {
-                                    id: 'gs-' + index,
-                                    timestamp: row.c && row.c[0] ? (row.c[0].f || row.c[0].v) : new Date().toISOString(),
-                                    name: row.c && row.c[1] ? row.c[1].v : 'Unknown',
-                                    email: row.c && row.c[2] ? row.c[2].v : 'No Email',
-                                    subject: row.c && row.c[5] ? row.c[5].v : 'No Service',
-                                    message: row.c && row.c[6] ? row.c[6].v : 'No Message',
-                                    type: row.c && row.c[7] ? (String(row.c[7].v).includes('Newsletter') ? 'Newsletter' : 'Contact') : 'Contact'
-                                };
-                            }).reverse();
-                            localStorage.setItem('shaivika_submissions', JSON.stringify(database.submissions));
+                    const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+                    const adminRes = await fetch('/api/admin/leads?page=1&limit=25', {
+                        headers: { 'Authorization': `Bearer ${token}`, 'x-admin-key': token }
+                    }).catch(() => null);
+
+                    if (adminRes && adminRes.ok) {
+                        const adminData = await adminRes.json();
+                        if (adminData && Array.isArray(adminData.leads)) {
+                            database.submissions = adminData.leads.map(l => ({
+                                ...l,
+                                timestamp: l.created_at || l.timestamp,
+                                createdAt: l.created_at || l.timestamp,
+                                type: l.project_type || 'Contact'
+                            }));
+                            leadsTotalCount = adminData.total || adminData.leads.length;
+                            leadsTotalPages = adminData.totalPages || 1;
                         }
                     } else {
                         let subs = localStorage.getItem('shaivika_submissions');
@@ -2848,40 +2850,124 @@
             });
         };
 
-        // LEADS TABLE
-        window.updateLeadStatus = (leadId, newStatus) => {
+        // LEADS TABLE WITH SUPABASE SERVER-SIDE PAGINATION & FILTERING
+        let leadsCurrentPage = 1;
+        const leadsPageLimit = 25;
+        let leadsTotalPages = 1;
+        let leadsTotalCount = 0;
+
+        window.updateLeadStatus = async (leadId, newStatus) => {
             const sub = database.submissions.find(s => s.id === leadId);
             if (sub) {
                 sub.status = newStatus;
                 sub.updatedAt = new Date().toISOString();
-                saveData();
-                showToast(`Lead status updated to: ${newStatus.toUpperCase()}`, 'success');
-                renderLeadsTable(document.getElementById('searchLeads')?.value || '', document.getElementById('filterLeadStatus')?.value || 'all');
             }
+
+            try {
+                const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+                const res = await fetch('/api/admin/leads', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'x-admin-key': token
+                    },
+                    body: JSON.stringify({ id: leadId, status: newStatus })
+                });
+
+                if (res.ok) {
+                    showToast(`Lead status updated to: ${newStatus.toUpperCase()}`, 'success');
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.message || 'Status updated locally.', 'warning');
+                }
+            } catch (err) {
+                showToast(`Lead status updated locally to: ${newStatus.toUpperCase()}`, 'info');
+            }
+
+            saveData();
+            renderLeadsTable(document.getElementById('searchLeads')?.value || '', document.getElementById('filterLeadStatus')?.value || 'all', leadsCurrentPage);
         };
 
-        const renderLeadsTable = (searchQuery = '', statusFilter = 'all') => {
+        const renderLeadsTable = async (searchQuery = '', statusFilter = 'all', page = 1) => {
             const tbody = document.getElementById('leadsTableBody');
+            if (!tbody) return;
+            leadsCurrentPage = Math.max(Number(page) || 1, 1);
+
+            // Attempt server-side fetch from /api/admin/leads
+            let fetchedFromServer = false;
+            try {
+                const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+                const endpoint = `/api/admin/leads?page=${leadsCurrentPage}&limit=${leadsPageLimit}&status=${encodeURIComponent(statusFilter)}&search=${encodeURIComponent(searchQuery)}`;
+                const res = await fetch(endpoint, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'x-admin-key': token
+                    }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && Array.isArray(data.leads)) {
+                        database.submissions = data.leads.map(l => ({
+                            ...l,
+                            timestamp: l.created_at || l.timestamp,
+                            createdAt: l.created_at || l.timestamp,
+                            type: l.project_type || 'Contact'
+                        }));
+                        leadsTotalCount = data.total || 0;
+                        leadsTotalPages = data.totalPages || 1;
+                        leadsCurrentPage = data.page || 1;
+                        fetchedFromServer = true;
+                    }
+                }
+            } catch (apiErr) {
+                // Serverless API offline or running static server fallback
+            }
+
+            let displayLeads = database.submissions;
+
+            // Client-side fallback filter & slice if server query wasn't available
+            if (!fetchedFromServer) {
+                let filtered = [...database.submissions].sort((a,b) => new Date(b.createdAt || b.timestamp) - new Date(a.createdAt || a.timestamp));
+
+                if (statusFilter && statusFilter !== 'all') {
+                    filtered = filtered.filter(l => (l.status || 'new').toLowerCase() === statusFilter.toLowerCase());
+                }
+
+                if (searchQuery) {
+                    const q = searchQuery.toLowerCase();
+                    filtered = filtered.filter(l => 
+                        (l.name || '').toLowerCase().includes(q) || 
+                        (l.email || '').toLowerCase().includes(q) || 
+                        (l.company || '').toLowerCase().includes(q) ||
+                        (l.country || '').toLowerCase().includes(q) ||
+                        (l.projectType || l.type || '').toLowerCase().includes(q) ||
+                        (l.description || l.message || '').toLowerCase().includes(q)
+                    );
+                }
+
+                leadsTotalCount = filtered.length;
+                leadsTotalPages = Math.max(Math.ceil(leadsTotalCount / leadsPageLimit), 1);
+                const startIndex = (leadsCurrentPage - 1) * leadsPageLimit;
+                displayLeads = filtered.slice(startIndex, startIndex + leadsPageLimit);
+            }
+
+            // Update Pagination UI
+            const paginationInfo = document.getElementById('leadsPaginationInfo');
+            const prevBtn = document.getElementById('leadsPrevPageBtn');
+            const nextBtn = document.getElementById('leadsNextPageBtn');
+
+            if (paginationInfo) {
+                const countMsg = leadsTotalCount > 0 ? `(${leadsTotalCount} total leads)` : '';
+                paginationInfo.textContent = `Showing page ${leadsCurrentPage} of ${leadsTotalPages} ${countMsg}`.trim();
+            }
+            if (prevBtn) prevBtn.disabled = leadsCurrentPage <= 1;
+            if (nextBtn) nextBtn.disabled = leadsCurrentPage >= leadsTotalPages;
+
             tbody.innerHTML = '';
-            let filtered = [...database.submissions].sort((a,b) => new Date(b.createdAt || b.timestamp) - new Date(a.createdAt || a.timestamp));
 
-            if (statusFilter && statusFilter !== 'all') {
-                filtered = filtered.filter(l => (l.status || 'new').toLowerCase() === statusFilter.toLowerCase());
-            }
-
-            if (searchQuery) {
-                const q = searchQuery.toLowerCase();
-                filtered = filtered.filter(l => 
-                    (l.name || '').toLowerCase().includes(q) || 
-                    (l.email || '').toLowerCase().includes(q) || 
-                    (l.company || '').toLowerCase().includes(q) ||
-                    (l.country || '').toLowerCase().includes(q) ||
-                    (l.projectType || l.type || '').toLowerCase().includes(q) ||
-                    (l.description || l.message || '').toLowerCase().includes(q)
-                );
-            }
-
-            if (filtered.length === 0) {
+            if (displayLeads.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding:28px;">No leads found.</td></tr>';
                 return;
             }
@@ -2897,7 +2983,7 @@
                 return '#94a3b8';
             };
 
-            filtered.forEach(sub => {
+            displayLeads.forEach(sub => {
                 const tr = document.createElement('tr');
                 const date = new Date(sub.createdAt || sub.timestamp).toLocaleDateString();
                 const curStatus = (sub.status || 'new').toLowerCase();
@@ -2937,16 +3023,55 @@
             });
         };
 
+        // Wire pagination buttons
+        document.getElementById('leadsPrevPageBtn')?.addEventListener('click', () => {
+            if (leadsCurrentPage > 1) {
+                renderLeadsTable(document.getElementById('searchLeads')?.value || '', document.getElementById('filterLeadStatus')?.value || 'all', leadsCurrentPage - 1);
+            }
+        });
+
+        document.getElementById('leadsNextPageBtn')?.addEventListener('click', () => {
+            if (leadsCurrentPage < leadsTotalPages) {
+                renderLeadsTable(document.getElementById('searchLeads')?.value || '', document.getElementById('filterLeadStatus')?.value || 'all', leadsCurrentPage + 1);
+            }
+        });
+
         document.getElementById('searchLeads')?.addEventListener('input', (e) => {
-            renderLeadsTable(e.target.value, document.getElementById('filterLeadStatus')?.value || 'all');
+            renderLeadsTable(e.target.value, document.getElementById('filterLeadStatus')?.value || 'all', 1);
         });
 
         document.getElementById('filterLeadStatus')?.addEventListener('change', (e) => {
-            renderLeadsTable(document.getElementById('searchLeads')?.value || '', e.target.value);
+            renderLeadsTable(document.getElementById('searchLeads')?.value || '', e.target.value, 1);
         });
 
-        // Leads Export CSV
-        document.getElementById('exportLeadsCsv')?.addEventListener('click', () => {
+        // Leads Export CSV (Supabase backend with fallback)
+        document.getElementById('exportLeadsCsv')?.addEventListener('click', async () => {
+            const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+            const status = document.getElementById('filterLeadStatus')?.value || 'all';
+            const search = document.getElementById('searchLeads')?.value || '';
+
+            try {
+                const res = await fetch(`/api/admin/leads?export=csv&status=${encodeURIComponent(status)}&search=${encodeURIComponent(search)}`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'x-admin-key': token }
+                });
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `shaivika_leads_${new Date().toISOString().slice(0,10)}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    URL.revokeObjectURL(url);
+                    showToast('Leads CSV exported from Supabase database.', 'success');
+                    return;
+                }
+            } catch (err) {
+                console.warn('Direct CSV export fallback:', err);
+            }
+
+            // Fallback CSV export
             if (!database.submissions || !database.submissions.length) {
                 showToast('No leads available to export.', 'error');
                 return;
@@ -2978,8 +3103,33 @@
             showToast('Leads CSV exported successfully.', 'success');
         });
 
-        // Leads Export JSON
-        document.getElementById('exportLeadsJson')?.addEventListener('click', () => {
+        // Leads Export JSON (Supabase backend with fallback)
+        document.getElementById('exportLeadsJson')?.addEventListener('click', async () => {
+            const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+            const status = document.getElementById('filterLeadStatus')?.value || 'all';
+            const search = document.getElementById('searchLeads')?.value || '';
+
+            try {
+                const res = await fetch(`/api/admin/leads?export=json&status=${encodeURIComponent(status)}&search=${encodeURIComponent(search)}`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'x-admin-key': token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const jsonStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data.leads || [], null, 2));
+                    const link = document.createElement('a');
+                    link.setAttribute('href', jsonStr);
+                    link.setAttribute('download', `shaivika_leads_${new Date().toISOString().slice(0,10)}.json`);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    showToast('Leads JSON exported from Supabase database.', 'success');
+                    return;
+                }
+            } catch (err) {
+                console.warn('Direct JSON export fallback:', err);
+            }
+
+            // Fallback JSON export
             if (!database.submissions || !database.submissions.length) {
                 showToast('No leads available to export.', 'error');
                 return;
