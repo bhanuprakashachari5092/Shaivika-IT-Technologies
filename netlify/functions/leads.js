@@ -19,6 +19,7 @@
  */
 
 const { isSupabaseConfigured, insertLead, checkDuplicateLead, hashIp } = require('./utils/supabase');
+const { sendLeadNotification } = require('./utils/email');
 
 // Simple in-memory sliding window rate limiter
 const rateLimitMap = new Map();
@@ -318,47 +319,9 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // 6. Email Notification Interface (Dispatched AFTER Database Insertion)
+  // 6. Professional Email Notification (Dispatched AFTER Database Insertion)
   // If email fails, the lead remains safely in Supabase.
-  const verifiedBusinessEmail = 'shaivikagroups@gmail.com';
-  const notificationSubject = `New Project Inquiry — ${savedLead.project_type || projectType}`;
-
-  if (process.env.RESEND_API_KEY) {
-    try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          from: process.env.EMAIL_FROM || 'inquiries@shaivikaittechnologies.in',
-          to: verifiedBusinessEmail,
-          subject: notificationSubject,
-          text: `
-New Lead Received:
-Name: ${savedLead.name}
-Email: ${savedLead.email}
-Company: ${savedLead.company || 'N/A'}
-Country: ${savedLead.country || 'N/A'}
-Project Type: ${savedLead.project_type || projectType}
-Budget: ${savedLead.budget || budget}
-Target Launch: ${rawLaunchDate || 'N/A'}
-Contact Preference: ${savedLead.contact_method || contactMethod}
-Description:
-${savedLead.description}
-
-Lead ID: ${savedLead.id}
-Timestamp: ${savedLead.created_at || new Date().toISOString()}
-          `.trim()
-        })
-      });
-    } catch (emailErr) {
-      console.error('[Leads API] Email dispatch failed (Lead stored safely in Supabase):', emailErr.message);
-    }
-  } else {
-    console.info(`[Leads API] Lead ${savedLead.id} stored in Supabase. Email notification skipped (RESEND_API_KEY not configured).`);
-  }
+  await sendLeadNotification(savedLead);
 
   // 7. Return Safe Response (Never exposes internal database information)
   return {
