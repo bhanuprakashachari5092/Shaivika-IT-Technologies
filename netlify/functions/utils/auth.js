@@ -1,14 +1,21 @@
 /**
- * SHAIVIKA IT TECHNOLOGIES — ADMIN AUTHENTICATION UTILITY
+ * SHAIVIKA IT TECHNOLOGIES — HARDENED ADMIN AUTHENTICATION UTILITY
  * 
  * Secure Supabase GoTrue Auth verification, session validation,
- * and role-based access control for administrative routes.
+ * and canonical role-based access control (RBAC) for administrative routes.
  *
- * Security:
- * - Validates Supabase Auth JWT access tokens via GoTrue server endpoint
- * - Verifies administrator role (app_metadata / user_metadata / public.admin_users table / ADMIN_EMAILS)
- * - Keeps SUPABASE_SERVICE_ROLE_KEY strictly server-side
- * - Preserves backward compatibility with ADMIN_KEY for internal automated calls
+ * Security Hardening:
+ * - Pure Supabase GoTrue JWT access token validation via /auth/v1/user
+ * - Canonical RBAC: user.app_metadata.role === 'admin' (strictly service-role / server managed)
+ * - Zero ADMIN_KEY authentication bypass (ADMIN_KEY is fully deprecated & rejected with 401)
+ * - Strict HTTP status codes:
+ *     * Missing credentials -> 401
+ *     * Invalid / expired token -> 401
+ *     * Authenticated non-admin user -> 403
+ *     * Authenticated admin user -> 200
+ * - Password recovery never leaks user existence
+ * - Never logs passwords, tokens, or credentials
+ * - Zero SUPABASE_SERVICE_ROLE_KEY exposure to client
  */
 
 function getSupabaseConfig() {
@@ -17,20 +24,13 @@ function getSupabaseConfig() {
   return { url, serviceKey, isConfigured: Boolean(url && serviceKey) };
 }
 
-function getServiceHeaders(serviceKey, extra = {}) {
-  return {
-    'apikey': serviceKey,
-    'Authorization': `Bearer ${serviceKey}`,
-    'Content-Type': 'application/json',
-    ...extra
-  };
-}
-
 /**
  * Verify a Supabase Auth access token by calling the GoTrue user endpoint
  */
 async function verifySupabaseToken(accessToken) {
-  if (!accessToken || typeof accessToken !== 'string') return null;
+  if (!accessToken || typeof accessToken !== 'string' || accessToken.trim() === '') {
+    return null;
+  }
   const { url, serviceKey, isConfigured } = getSupabaseConfig();
   if (!isConfigured) return null;
 
@@ -48,100 +48,63 @@ async function verifySupabaseToken(accessToken) {
       return user && user.id ? user : null;
     }
   } catch (err) {
-    console.warn('[Admin Auth] Token verification error:', err.message);
+    // Non-fatal, do not log sensitive data
   }
   return null;
 }
 
 /**
- * Check if the user is an authorized administrator
+ * Canonical Administrator Authorization:
+ * Verified strictly via Supabase Auth app_metadata.role === 'admin'.
+ * Unlike user_metadata, app_metadata is immutable from client-side APIs
+ * and can only be set via the Supabase Admin API or Dashboard.
  */
 async function isUserAdmin(user) {
-  if (!user) return false;
-
-  // 1. Check user metadata or app metadata
-  const appRole = user.app_metadata?.role;
-  const userRole = user.user_metadata?.role;
-  if (appRole === 'admin' || appRole === 'super_admin' || userRole === 'admin' || userRole === 'super_admin') {
-    return true;
-  }
-
-  // 2. Check configured ADMIN_EMAILS environment variable
-  const userEmail = (user.email || '').toLowerCase().trim();
-  const configuredAdminEmails = (process.env.ADMIN_EMAILS || 'shaivikagroups@gmail.com,kh2kgaming@gmail.com')
-    .toLowerCase()
-    .split(',')
-    .map(e => e.trim())
-    .filter(Boolean);
-
-  if (userEmail && configuredAdminEmails.includes(userEmail)) {
-    return true;
-  }
-
-  // 3. Check public.admin_users table in Supabase
-  const { url, serviceKey, isConfigured } = getSupabaseConfig();
-  if (isConfigured && user.id) {
-    try {
-      const endpoint = `${url}/rest/v1/admin_users?user_id=eq.${encodeURIComponent(user.id)}&role=in.(admin,super_admin)&select=id`;
-      const res = await fetch(endpoint, {
-        method: 'GET',
-        headers: getServiceHeaders(serviceKey)
-      });
-      if (res.ok) {
-        const rows = await res.json();
-        if (Array.isArray(rows) && rows.length > 0) return true;
-      }
-    } catch (dbErr) {
-      // Non-fatal if table not yet migrated
-    }
-  }
-
-  return false;
+  if (!user || typeof user !== 'object') return false;
+  const role = user.app_metadata?.role;
+  return role === 'admin' || role === 'super_admin';
 }
 
 /**
  * Authenticate incoming HTTP request to admin endpoints
- * Supports:
- * - Supabase Auth Bearer JWT token
- * - Pre-configured server-to-server ADMIN_KEY (for automated tests / CLI)
+ * Canonical verification:
+ * - Extract Bearer token from Authorization header
+ * - Reject any ADMIN_KEY attempts with 401
+ * - Verify user via Supabase GoTrue
+ * - Verify admin role via server-managed app_metadata
+ *
+ * Returns:
+ * - { authorized: false, statusCode: 401, reason: 'MISSING_CREDENTIALS' }
+ * - { authorized: false, statusCode: 401, reason: 'INVALID_OR_EXPIRED_TOKEN' }
+ * - { authorized: false, statusCode: 403, reason: 'NOT_AN_ADMINISTRATOR', user }
+ * - { authorized: true, statusCode: 200, user }
  */
 async function verifyAdminRequest(headers) {
-  const authHeader = headers['authorization'] || headers['Authorization'] || '';
-  const xAdminKey = headers['x-admin-key'] || headers['X-Admin-Key'] || '';
+  const authHeader = (headers && (headers['authorization'] || headers['Authorization'])) || '';
 
   let token = '';
-  if (authHeader.startsWith('Bearer ')) {
+  if (typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
     token = authHeader.substring(7).trim();
-  } else if (authHeader) {
-    token = authHeader.trim();
-  } else if (xAdminKey) {
-    token = xAdminKey.trim();
   }
 
+  // Missing Bearer token
   if (!token) {
-    return { authorized: false, reason: 'MISSING_CREDENTIALS' };
+    return { authorized: false, statusCode: 401, reason: 'MISSING_CREDENTIALS' };
   }
 
-  // 1. Direct ADMIN_KEY check (backward-compatibility for tests / Netlify cron)
-  const expectedKey = process.env.ADMIN_KEY || process.env.ADMIN_PASSWORD || 'shaivika_admin_2026';
-  const legacyFallbackKeys = ['googlemanoj', 'adminpassword123', 'admin123', 'shaivika_admin_2026'];
-  if (token === expectedKey || legacyFallbackKeys.includes(token)) {
-    return { authorized: true, method: 'admin_key' };
-  }
-
-  // 2. Supabase Auth JWT Token check
+  // Pure Supabase Auth token check — ADMIN_KEY legacy bypass completely removed
   const user = await verifySupabaseToken(token);
   if (!user) {
-    return { authorized: false, reason: 'INVALID_OR_EXPIRED_TOKEN' };
+    return { authorized: false, statusCode: 401, reason: 'INVALID_OR_EXPIRED_TOKEN' };
   }
 
-  // 3. Role authorization check
+  // Canonical role check via server-managed app_metadata
   const hasAdminRole = await isUserAdmin(user);
   if (!hasAdminRole) {
-    return { authorized: false, reason: 'NOT_AN_ADMINISTRATOR', user };
+    return { authorized: false, statusCode: 403, reason: 'NOT_AN_ADMINISTRATOR', user };
   }
 
-  return { authorized: true, method: 'supabase_auth', user };
+  return { authorized: true, statusCode: 200, user };
 }
 
 /**
@@ -153,6 +116,11 @@ async function loginWithPassword(email, password) {
     throw new Error('SUPABASE_NOT_CONFIGURED');
   }
 
+  const cleanEmail = (email || '').trim().toLowerCase();
+  if (!cleanEmail || !password) {
+    return { success: false, error: 'Email and password are required.', statusCode: 400 };
+  }
+
   const endpoint = `${url}/auth/v1/token?grant_type=password`;
   const res = await fetch(endpoint, {
     method: 'POST',
@@ -161,15 +129,14 @@ async function loginWithPassword(email, password) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      email: (email || '').trim().toLowerCase(),
+      email: cleanEmail,
       password
     })
   });
 
   const data = await res.json();
   if (!res.ok) {
-    const errorMsg = data.error_description || data.msg || data.message || 'Invalid email or password.';
-    return { success: false, error: errorMsg, statusCode: res.status };
+    return { success: false, error: 'Invalid email or password.', statusCode: 401 };
   }
 
   const user = data.user;
@@ -199,65 +166,83 @@ async function loginWithPassword(email, password) {
  * Refresh an existing Supabase Auth session token
  */
 async function refreshSessionToken(refreshToken) {
+  if (!refreshToken || typeof refreshToken !== 'string' || refreshToken.trim() === '') {
+    return { success: false, error: 'Valid refresh token is required.', statusCode: 400 };
+  }
+
   const { url, serviceKey, isConfigured } = getSupabaseConfig();
   if (!isConfigured) throw new Error('SUPABASE_NOT_CONFIGURED');
 
-  const endpoint = `${url}/auth/v1/token?grant_type=refresh_token`;
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'apikey': serviceKey,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ refresh_token: refreshToken })
-  });
+  try {
+    const endpoint = `${url}/auth/v1/token?grant_type=refresh_token`;
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'apikey': serviceKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ refresh_token: refreshToken.trim() })
+    });
 
-  const data = await res.json();
-  if (!res.ok) {
-    return { success: false, error: 'Session expired or refresh token invalid.' };
-  }
-
-  const adminCheck = await isUserAdmin(data.user);
-  if (!adminCheck) {
-    return { success: false, error: 'Account is not an authorized administrator.' };
-  }
-
-  return {
-    success: true,
-    accessToken: data.access_token,
-    refreshToken: data.refresh_token,
-    expiresIn: data.expires_in,
-    user: {
-      id: data.user.id,
-      email: data.user.email,
-      role: 'admin'
+    const data = await res.json();
+    if (!res.ok) {
+      return { success: false, error: 'Session expired or refresh token invalid.', statusCode: 401 };
     }
-  };
+
+    const adminCheck = await isUserAdmin(data.user);
+    if (!adminCheck) {
+      return { success: false, error: 'Account is not an authorized administrator.', statusCode: 403 };
+    }
+
+    return {
+      success: true,
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresIn: data.expires_in,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        role: 'admin'
+      }
+    };
+  } catch (err) {
+    return { success: false, error: 'Failed to refresh authentication session.', statusCode: 500 };
+  }
 }
 
 /**
  * Send password recovery email via Supabase GoTrue
+ * Always returns a generic success message to prevent user enumeration attacks.
  */
 async function sendPasswordRecovery(email) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  if (!cleanEmail || !cleanEmail.includes('@')) {
+    return { success: false, error: 'Valid administrator email is required.', statusCode: 400 };
+  }
+
   const { url, serviceKey, isConfigured } = getSupabaseConfig();
   if (!isConfigured) throw new Error('SUPABASE_NOT_CONFIGURED');
 
-  const endpoint = `${url}/auth/v1/recover`;
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'apikey': serviceKey,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ email: (email || '').trim().toLowerCase() })
-  });
-
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    return { success: false, error: data.msg || data.message || 'Password reset request failed.' };
+  try {
+    const endpoint = `${url}/auth/v1/recover`;
+    await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'apikey': serviceKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: cleanEmail })
+    });
+  } catch (err) {
+    // Non-fatal, do not log emails or sensitive parameters
   }
 
-  return { success: true, message: 'Password recovery email sent successfully if the account exists.' };
+  // Consistent message regardless of whether the account exists
+  return {
+    success: true,
+    statusCode: 200,
+    message: 'If an account exists for this email, password recovery instructions have been sent.'
+  };
 }
 
 module.exports = {

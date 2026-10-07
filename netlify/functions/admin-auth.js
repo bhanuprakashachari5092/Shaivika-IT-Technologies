@@ -1,14 +1,15 @@
 /**
- * SHAIVIKA IT TECHNOLOGIES — ADMIN AUTHENTICATION API
+ * SHAIVIKA IT TECHNOLOGIES — HARDENED ADMIN AUTHENTICATION API
  * POST /api/admin/auth (login, refresh, recover, logout)
  * GET /api/admin/auth (verify session)
  *
- * Implements:
+ * Security:
  * - Supabase GoTrue email & password authentication
- * - Role-based administrator authorization checks
- * - Token verification & session refreshing
- * - Self-service password recovery dispatch
+ * - Canonical role-based administrator authorization checks (app_metadata.role === 'admin')
+ * - Zero ADMIN_KEY bypass allowed
+ * - Strict 401 (unauthenticated) and 403 (unauthorized) handling
  * - Zero service-role key exposure to client
+ * - Generic password recovery messaging (prevents user enumeration)
  */
 
 const {
@@ -21,7 +22,7 @@ const {
 exports.handler = async (event, context) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-admin-key',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Content-Type': 'application/json; charset=utf-8'
   };
@@ -35,11 +36,13 @@ exports.handler = async (event, context) => {
     const authResult = await verifyAdminRequest(event.headers);
     if (!authResult.authorized) {
       return {
-        statusCode: 401,
+        statusCode: authResult.statusCode || 401,
         headers: corsHeaders,
         body: JSON.stringify({
           success: false,
-          message: 'Session invalid or expired. Please sign in.',
+          message: authResult.statusCode === 403
+            ? 'Access denied: Account is not authorized as an administrator.'
+            : 'Session invalid or expired. Please sign in.',
           reason: authResult.reason
         })
       };
@@ -51,13 +54,12 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         authenticated: true,
-        user: authResult.user || { role: 'admin' },
-        method: authResult.method
+        user: authResult.user
       })
     };
   }
 
-  // POST: Login, Refresh, Recover
+  // POST: Login, Refresh, Recover, Logout
   if (event.httpMethod === 'POST') {
     let body;
     try {
@@ -73,7 +75,7 @@ exports.handler = async (event, context) => {
     const action = (body.action || '').toLowerCase().trim();
     const path = (event.path || '').toLowerCase();
 
-    // 1. Password Recovery Action
+    // 1. Password Recovery Action (Prevents user enumeration)
     if (action === 'recover' || path.endsWith('/recover')) {
       if (!body.email) {
         return {
@@ -84,7 +86,7 @@ exports.handler = async (event, context) => {
       }
       const recoverResult = await sendPasswordRecovery(body.email);
       return {
-        statusCode: recoverResult.success ? 200 : 400,
+        statusCode: recoverResult.statusCode || 200,
         headers: corsHeaders,
         body: JSON.stringify(recoverResult)
       };
@@ -101,7 +103,7 @@ exports.handler = async (event, context) => {
       }
       const refreshResult = await refreshSessionToken(body.refreshToken);
       return {
-        statusCode: refreshResult.success ? 200 : 401,
+        statusCode: refreshResult.statusCode || (refreshResult.success ? 200 : 401),
         headers: corsHeaders,
         body: JSON.stringify(refreshResult)
       };
@@ -154,7 +156,6 @@ exports.handler = async (event, context) => {
         })
       };
     } catch (err) {
-      console.error('[Admin Auth API] Login error:', err.message);
       return {
         statusCode: 500,
         headers: corsHeaders,

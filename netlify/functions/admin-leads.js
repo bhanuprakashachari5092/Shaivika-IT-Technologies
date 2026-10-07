@@ -65,7 +65,7 @@ function convertLeadsToCsv(leads) {
 exports.handler = async (event, context) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-admin-key',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, PATCH, OPTIONS',
     'Content-Type': 'application/json; charset=utf-8'
   };
@@ -91,15 +91,17 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Security Check: Authenticate Admin (Supabase Auth JWT or ADMIN_KEY)
+  // Security Check: Authenticate Admin (Pure Supabase Auth JWT)
   const authResult = await verifyAdminRequest(event.headers);
   if (!authResult.authorized) {
     return {
-      statusCode: 401,
+      statusCode: authResult.statusCode || 401,
       headers: corsHeaders,
       body: JSON.stringify({
         success: false,
-        message: 'Unauthorized. Valid administrator credentials required.',
+        message: authResult.statusCode === 403
+          ? 'Forbidden: Account is not authorized as an administrator.'
+          : 'Unauthorized. Valid administrator credentials required.',
         reason: authResult.reason
       })
     };

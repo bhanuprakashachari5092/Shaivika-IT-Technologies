@@ -1,6 +1,6 @@
-# SHAIVIKA IT TECHNOLOGIES — SECURE ADMIN AUTHENTICATION ARCHITECTURE
+# SHAIVIKA IT TECHNOLOGIES — HARDENED ADMIN AUTHENTICATION ARCHITECTURE
 
-Enterprise administrator authentication and role-based access control for `shaivikaittechnologies.in` using Supabase Auth (GoTrue), serverless Netlify Functions, and hardened session management.
+Enterprise administrator authentication and canonical role-based access control (RBAC) for `shaivikaittechnologies.in` using Supabase Auth (GoTrue), serverless Netlify Functions, and hardened session management.
 
 ---
 
@@ -10,50 +10,53 @@ Enterprise administrator authentication and role-based access control for `shaiv
 Browser (/admin)
     ├── Unauthenticated Visitor -> Shows Clean Admin Login Form
     │   ├── Email & Password Input
-    │   ├── "Forgot password?" Self-service Recovery
+    │   ├── "Forgot password?" Generic Recovery (No User Enumeration)
     │   └── Zero UI flash of protected Lead Dashboard
     │
     └── Authentication Flow
             ↓
     POST /api/admin/auth (netlify/functions/admin-auth.js)
-            ├── Validates request payload
-            ├── Authenticates via Supabase GoTrue Auth
-            ├── Verifies Administrator Role (metadata / public.admin_users / ADMIN_EMAILS)
+            ├── Validates credentials via Supabase GoTrue Auth
+            ├── Canonical RBAC: Verifies user.app_metadata.role === 'admin'
             └── Returns: { token: JWT, refreshToken, expiresIn, user }
             ↓
     Client Session Established
-            ├── Tokens saved in sessionStorage + localStorage
+            ├── Unified single storage key: localStorage.shaivika_admin_session
+            ├── No duplicate storage across multiple storage APIs
             ├── Automatic session restore on page reload
             ├── Refresh token rotation when access token expires
-            └── Seamless Logout (revokes token & clears storage)
+            └── Seamless Logout (clears tokens and session)
             ↓
     Protected Dashboard Opens (/admin)
             ↓
     API Requests: GET / PATCH /api/admin/leads (netlify/functions/admin-leads.js)
             ├── Authorization: Bearer <JWT>
             ├── Netlify Function verifies token with Supabase GoTrue
-            ├── Netlify Function verifies administrator authorization
+            ├── Netlify Function enforces canonical administrator authorization
             └── Queries Supabase PostgreSQL (via server-side service-role key)
 ```
 
 ---
 
-## 2. Security Guarantees
+## 2. Security Hardening Guarantees
 
 | Security Requirement | Implementation |
 |---|---|
 | **Zero Service-Role Key Exposure** | `SUPABASE_SERVICE_ROLE_KEY` is strictly server-side in Netlify Functions. Never bundled in frontend HTML/JS. |
 | **Password Storage** | Passwords are never stored locally or encrypted manually. Delegated exclusively to Supabase Auth's bcrypt/Argon2. |
-| **Role-Based Authorization** | Authentication alone is not enough. Accounts must have `role: admin` or be in `public.admin_users` to access dashboard/leads. |
+| **Canonical Role Authorization** | Canonical RBAC enforced via `app_metadata.role === 'admin'`. Client-editable `user_metadata` is untrusted. |
+| **ADMIN_KEY Legacy Removal** | `ADMIN_KEY` bypass is completely removed and rejected with `401 Unauthorized`. |
+| **Token Storage** | Unified single storage under `localStorage.shaivika_admin_session`. Zero duplication. |
+| **Generic Password Recovery** | Prevents user enumeration by returning a generic response regardless of whether an email exists. |
 | **Direct Navigation Protection** | Opening `/admin` directly without valid credentials never renders the dashboard or fetches leads. |
 | **Session Expiration** | Expired tokens trigger silent refresh; if refresh fails, user is returned to the login screen with an alert. |
-| **Legacy Compatibility** | Internal server calls & automated migration test suites continue to support `ADMIN_KEY` header for backward-compatibility. |
+| **Zero Secrets in Frontend** | No service-role key, no legacy passwords, and no hardcoded tokens exist in client files or `dist/`. |
 
 ---
 
 ## 3. How to Create an Administrator Account in Supabase
 
-Production administrators must be created via the official Supabase Dashboard to ensure full owner control:
+Production administrators must be created via the official Supabase Dashboard:
 
 ### Step 1: Open Supabase Project
 1. Go to [https://supabase.com/dashboard](https://supabase.com/dashboard).
@@ -68,28 +71,15 @@ Production administrators must be created via the official Supabase Dashboard to
    - Check **Auto Confirm User?** -> **Yes** (to enable immediate sign-in).
 4. Click **Create User**.
 
-### Step 3: Assign Admin Role
-
-You can assign admin permissions using either of the following standard methods:
-
-#### Method A: User Metadata (Recommended - Easiest)
+### Step 3: Assign Canonical Admin Role
 1. In **Authentication** -> **Users**, click on the newly created user.
-2. In the **User Metadata** (JSON) editor, add:
+2. In the **App Metadata** editor (or via Supabase SQL Admin), set:
    ```json
    {
      "role": "admin"
    }
    ```
-3. Click **Save**.
-
-#### Method B: `public.admin_users` Table (Database Driven)
-1. Go to **SQL Editor** in Supabase Dashboard.
-2. Run the following query using the user's UUID from the Users tab:
-   ```sql
-   INSERT INTO public.admin_users (user_id, email, role)
-   VALUES ('<USER-UUID-HERE>', 'shaivikagroups@gmail.com', 'admin')
-   ON CONFLICT (user_id) DO UPDATE SET role = 'admin';
-   ```
+   *Note: `app_metadata` is strictly server-controlled and cannot be altered by client users.*
 
 ---
 
@@ -149,6 +139,13 @@ Content-Type: application/json
   "email": "shaivikagroups@gmail.com"
 }
 ```
+**Response (200 OK - Always generic):**
+```json
+{
+  "success": true,
+  "message": "If an account exists for this email, password recovery instructions have been sent."
+}
+```
 
 ---
 
@@ -160,15 +157,10 @@ Validates currently active session token.
 GET /api/admin/auth
 Authorization: Bearer <TOKEN>
 ```
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "authenticated": true,
-  "user": { ... },
-  "method": "supabase_auth"
-}
-```
+**Status Codes:**
+- `401 Unauthorized`: Token missing, invalid, expired, or legacy ADMIN_KEY attempt
+- `403 Forbidden`: Authenticated user does not possess `admin` role in `app_metadata`
+- `200 OK`: Valid administrator session
 
 ---
 
@@ -181,14 +173,10 @@ GET /api/admin/leads?page=1&limit=25&status=all
 Authorization: Bearer <TOKEN>
 ```
 
-**Response (401 Unauthorized if token missing or invalid):**
-```json
-{
-  "success": false,
-  "message": "Unauthorized. Valid administrator credentials required.",
-  "reason": "MISSING_CREDENTIALS"
-}
-```
+**Status Codes:**
+- `401 Unauthorized`: Missing or invalid Bearer token
+- `403 Forbidden`: Non-admin user account
+- `200 OK`: Paginated leads list or CSV/JSON export
 
 ---
 
@@ -200,19 +188,18 @@ In Netlify Dashboard under **Site Settings -> Environment variables**:
 |---|---|
 | `SUPABASE_URL` | Supabase Project REST URL (`https://<project-ref>.supabase.co`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase Service Role Secret Key (Server-side only) |
-| `ADMIN_EMAILS` | Comma-separated authorized admin emails (`shaivikagroups@gmail.com,...`) |
-| `ADMIN_KEY` | Server-to-server key for backward compatibility & automated cron scripts |
+| `ADMIN_KEY` | *(Deprecated)* No longer used for runtime authentication bypass |
 
 ---
 
-## 6. Verification Test Suite
+## 6. Verification Test Suites
 
-Run the automated test suite locally to verify full security compliance:
+Run both automated test suites locally:
 
 ```bash
-# 1. Verify all 20 public lead pipeline integration tests
+# 1. 20-Point Public Lead Pipeline Integration Tests
 node scratch/test_leads_suite.cjs
 
-# 2. Verify admin authentication, session checks, and Supabase JWT authorization
-node -e "require('./netlify/functions/admin-auth')"
+# 2. 14-Point Hardened Security Audit Test Suite
+node scratch/test_admin_security_hardened.cjs
 ```
