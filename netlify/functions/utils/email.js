@@ -314,7 +314,7 @@ function createSmtpTransporter() {
     secure,
     auth: {
       user,
-      pass
+      pass: pass.replace(/\s+/g, '')
     },
     connectionTimeout: 10000,
     greetingTimeout: 5000,
