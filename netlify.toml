@@ -106,4 +106,14 @@
   to = "/.netlify/functions/admin-leads"
   status = 200
 
+[[redirects]]
+  from = "/api/admin/auth/*"
+  to = "/.netlify/functions/admin-auth"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/auth"
+  to = "/.netlify/functions/admin-auth"
+  status = 200
+
 

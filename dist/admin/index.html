@@ -261,7 +261,31 @@
         .login-subtitle {
             color: var(--text-secondary);
             font-size: 0.9rem;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
+        }
+
+        .login-alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .login-alert.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+        .login-alert.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #6ee7b7;
+        }
+        .login-alert.info {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #7dd3fc;
         }
 
         .form-group {
@@ -354,7 +378,7 @@
         }
 
         .dashboard-container {
-            display: flex;
+            display: none;
             min-height: 100vh;
             width: 100%;
         }
@@ -891,26 +915,51 @@
     <!-- ===== LOGIN INTERFACE ===== -->
     <div class="login-wrapper" id="loginWrapper">
         <div class="login-card">
-            <h1 class="login-logo">SHAIVIKA</h1>
-            <p class="login-subtitle">Administrator Portal Login</p>
+            <h1 class="login-logo">SHAIVIKA IT TECHNOLOGIES</h1>
+            <p class="login-subtitle">Admin Portal</p>
+            
+            <div id="loginAlert" class="login-alert" style="display: none;" role="alert"></div>
+
             <form id="loginForm">
                 <div class="form-group">
-                    <label class="form-label" for="username">Username</label>
-                    <input class="form-input" type="text" id="username" required autocomplete="username">
+                    <label class="form-label" for="loginEmail">Email</label>
+                    <input class="form-input" type="email" id="loginEmail" required autocomplete="email" placeholder="admin@shaivikaittechnologies.in">
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input class="form-input" type="password" id="password" required autocomplete="current-password">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label class="form-label" for="loginPassword" style="margin-bottom: 0;">Password</label>
+                        <a href="javascript:void(0)" id="forgotPassLink" style="font-size: 0.8rem; color: var(--accent); text-decoration: none;">Forgot password?</a>
+                    </div>
+                    <input class="form-input" type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••••••">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Sign In</button>
+                <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                    <span id="loginBtnText">Sign In</span>
+                </button>
+            </form>
+
+            <!-- Password Recovery View -->
+            <form id="recoveryForm" style="display: none; text-align: left;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+                    Enter your administrator email to receive a password recovery link.
+                </p>
+                <div class="form-group">
+                    <label class="form-label" for="recoveryEmail">Administrator Email</label>
+                    <input class="form-input" type="email" id="recoveryEmail" required autocomplete="email" placeholder="admin@shaivikaittechnologies.in">
+                </div>
+                <button type="submit" id="recoverySubmitBtn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                    <span id="recoveryBtnText">Send Recovery Link</span>
+                </button>
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="javascript:void(0)" id="backToLoginLink" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;">← Back to Sign In</a>
+                </div>
             </form>
         </div>
     </div>
 
     <!-- ===== MAIN DASHBOARD ===== -->
     
-    <!-- Mobile Header (Visible only on mobile/tablet) -->
-    <header class="mobile-header">
+    <!-- Mobile Header (Visible only on mobile/tablet when authenticated) -->
+    <header class="mobile-header" id="mobileHeader" style="display: none;">
         <div class="mobile-header-title">SHAIVIKA ADMIN</div>
         <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Menu">
             <i class="fa-solid fa-bars"></i>
@@ -920,7 +969,7 @@
     <!-- Sidebar Overlay (Visible when sidebar is open on mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <div class="dashboard-container" id="dashboardContainer">
+    <div class="dashboard-container" id="dashboardContainer" style="display: none;">
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="adminSidebar">
             <div class="sidebar-header">
@@ -2332,6 +2381,14 @@
 
         const loginWrapper = document.getElementById('loginWrapper');
         const loginForm = document.getElementById('loginForm');
+        const recoveryForm = document.getElementById('recoveryForm');
+        const loginAlert = document.getElementById('loginAlert');
+        const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+        const loginBtnText = document.getElementById('loginBtnText');
+        const forgotPassLink = document.getElementById('forgotPassLink');
+        const backToLoginLink = document.getElementById('backToLoginLink');
+        const recoverySubmitBtn = document.getElementById('recoverySubmitBtn');
+        const recoveryBtnText = document.getElementById('recoveryBtnText');
         const dashboardContainer = document.getElementById('dashboardContainer');
         const logoutBtn = document.getElementById('logoutBtn');
         const sidebarLinks = document.querySelectorAll('.sidebar-link[data-tab]');
@@ -2340,8 +2397,50 @@
         const currentTime = document.getElementById('currentTime');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-        if (!localStorage.getItem('shaivika_admin_password') || localStorage.getItem('shaivika_admin_password') === 'adminpassword123') {
-            localStorage.setItem('shaivika_admin_password', 'googlemanoj');
+        function showLoginAlert(msg, type = 'error') {
+            if (!loginAlert) return;
+            loginAlert.className = `login-alert ${type}`;
+            loginAlert.textContent = msg;
+            loginAlert.style.display = 'block';
+        }
+
+        function hideLoginAlert() {
+            if (loginAlert) loginAlert.style.display = 'none';
+        }
+
+        function getAdminAuthToken() {
+            return sessionStorage.getItem('shaivika_admin_token') ||
+                   localStorage.getItem('shaivika_admin_token') ||
+                   '';
+        }
+
+        function getAdminRefreshToken() {
+            return sessionStorage.getItem('shaivika_admin_refresh_token') ||
+                   localStorage.getItem('shaivika_admin_refresh_token') ||
+                   '';
+        }
+
+        function setAdminSession(token, refreshToken, user) {
+            sessionStorage.setItem('shaivika_admin_token', token);
+            localStorage.setItem('shaivika_admin_token', token);
+            if (refreshToken) {
+                sessionStorage.setItem('shaivika_admin_refresh_token', refreshToken);
+                localStorage.setItem('shaivika_admin_refresh_token', refreshToken);
+            }
+            if (user) {
+                sessionStorage.setItem('shaivika_admin_user', JSON.stringify(user));
+            }
+            localStorage.setItem('shaivika_admin_logged_in', 'true');
+        }
+
+        function clearAdminSession() {
+            sessionStorage.removeItem('shaivika_admin_token');
+            sessionStorage.removeItem('shaivika_admin_refresh_token');
+            sessionStorage.removeItem('shaivika_admin_user');
+            localStorage.removeItem('shaivika_admin_token');
+            localStorage.removeItem('shaivika_admin_refresh_token');
+            localStorage.removeItem('shaivika_admin_logged_in');
+            localStorage.removeItem('shaivika_admin_password');
         }
 
         setInterval(() => {
@@ -2350,14 +2449,77 @@
         }, 1000);
         currentTime.textContent = new Date().toLocaleString();
 
-        const checkAuth = () => {
-            if (localStorage.getItem('shaivika_admin_logged_in') === 'true') {
-                loginWrapper.style.display = 'none';
-                dashboardContainer.style.display = 'flex';
-                loadData();
-            } else {
+        const mobileHeader = document.getElementById('mobileHeader') || document.querySelector('.mobile-header');
+
+        let isAuthenticating = false;
+        const checkAuth = async () => {
+            const token = getAdminAuthToken();
+            if (!token) {
                 loginWrapper.style.display = 'flex';
                 dashboardContainer.style.display = 'none';
+                if (mobileHeader) mobileHeader.style.display = 'none';
+                return;
+            }
+
+            if (isAuthenticating) return;
+            isAuthenticating = true;
+
+            try {
+                const res = await fetch('/api/admin/auth', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.authenticated) {
+                        loginWrapper.style.display = 'none';
+                        dashboardContainer.style.display = 'flex';
+                        if (mobileHeader) mobileHeader.style.display = '';
+                        loadData();
+                        return;
+                    }
+                }
+
+                // If token invalid, attempt refresh
+                const refreshToken = getAdminRefreshToken();
+                if (refreshToken) {
+                    const refreshRes = await fetch('/api/admin/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'refresh', refreshToken })
+                    });
+                    if (refreshRes.ok) {
+                        const refreshData = await refreshRes.json();
+                        if (refreshData.success && refreshData.accessToken) {
+                            setAdminSession(refreshData.accessToken, refreshData.refreshToken, refreshData.user);
+                            loginWrapper.style.display = 'none';
+                            dashboardContainer.style.display = 'flex';
+                            if (mobileHeader) mobileHeader.style.display = '';
+                            loadData();
+                            return;
+                        }
+                    }
+                }
+
+                // Session expired or unauthorized
+                clearAdminSession();
+                loginWrapper.style.display = 'flex';
+                dashboardContainer.style.display = 'none';
+                if (mobileHeader) mobileHeader.style.display = 'none';
+                showLoginAlert('Session expired. Please sign in with your administrator credentials.', 'error');
+            } catch (err) {
+                if (localStorage.getItem('shaivika_admin_logged_in') === 'true') {
+                    loginWrapper.style.display = 'none';
+                    dashboardContainer.style.display = 'flex';
+                    if (mobileHeader) mobileHeader.style.display = '';
+                    loadData();
+                } else {
+                    loginWrapper.style.display = 'flex';
+                    dashboardContainer.style.display = 'none';
+                    if (mobileHeader) mobileHeader.style.display = 'none';
+                }
+            } finally {
+                isAuthenticating = false;
             }
         };
 
@@ -2375,46 +2537,122 @@
             themeToggleBtn.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
         });
 
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+        // Forgot Password toggle
+        if (forgotPassLink) {
+            forgotPassLink.addEventListener('click', () => {
+                hideLoginAlert();
+                loginForm.style.display = 'none';
+                recoveryForm.style.display = 'block';
+            });
+        }
 
-            // Brute-force rate limiting and lockout protection
-            const lockoutUntil = parseInt(sessionStorage.getItem('shaivika_admin_lockout') || '0', 10);
-            const now = Date.now();
-            if (lockoutUntil > now) {
-                const remaining = Math.ceil((lockoutUntil - now) / 1000);
-                showToast(`Too many failed attempts. Locked for ${remaining}s.`, 'error');
+        if (backToLoginLink) {
+            backToLoginLink.addEventListener('click', () => {
+                hideLoginAlert();
+                recoveryForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            });
+        }
+
+        // Login submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideLoginAlert();
+
+            const email = (document.getElementById('loginEmail')?.value || '').trim();
+            const password = (document.getElementById('loginPassword')?.value || '').trim();
+
+            if (!email || !password) {
+                showLoginAlert('Please enter both email and password.', 'error');
                 return;
             }
 
-            const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
-            const storedPass = localStorage.getItem('shaivika_admin_password');
+            loginSubmitBtn.disabled = true;
+            loginBtnText.textContent = 'Signing in...';
 
-            if ((user === 'shaivika' || user === 'admin') && (pass === storedPass || pass === 'googlemanoj' || pass === 'adminpassword123' || pass === 'admin123')) {
-                sessionStorage.removeItem('shaivika_admin_failed_attempts');
-                sessionStorage.removeItem('shaivika_admin_lockout');
-                localStorage.setItem('shaivika_admin_logged_in', 'true');
-                localStorage.setItem('shaivika_admin_token', pass || 'shaivika_admin_2026');
-                showToast('Login successful!', 'success');
-                checkAuth();
-            } else {
-                let attempts = parseInt(sessionStorage.getItem('shaivika_admin_failed_attempts') || '0', 10) + 1;
-                sessionStorage.setItem('shaivika_admin_failed_attempts', attempts.toString());
-                if (attempts >= 5) {
-                    sessionStorage.setItem('shaivika_admin_lockout', (Date.now() + 30000).toString());
-                    showToast('Security lockout: 5 failed attempts. Locked for 30 seconds.', 'error');
+            try {
+                const res = await fetch('/api/admin/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'login', email, password })
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.success && data.token) {
+                    setAdminSession(data.token, data.refreshToken, data.user);
+                    showToast('Welcome to Shaivika Admin Portal', 'success');
+                    loginForm.reset();
+                    loginWrapper.style.display = 'none';
+                    dashboardContainer.style.display = 'flex';
+                    if (mobileHeader) mobileHeader.style.display = '';
+                    loadData();
                 } else {
-                    showToast(`Invalid credentials. (${5 - attempts} attempts remaining)`, 'error');
+                    showLoginAlert(data.message || 'Invalid administrator email or password.', 'error');
                 }
+            } catch (netErr) {
+                showLoginAlert('Network error during authentication. Please try again.', 'error');
+            } finally {
+                loginSubmitBtn.disabled = false;
+                loginBtnText.textContent = 'Sign In';
             }
         });
 
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('shaivika_admin_logged_in');
-            localStorage.removeItem('shaivika_admin_token');
-            showToast('Logged out successfully.', 'success');
-            checkAuth();
+        // Password recovery submission
+        if (recoveryForm) {
+            recoveryForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideLoginAlert();
+
+                const email = (document.getElementById('recoveryEmail')?.value || '').trim();
+                if (!email) {
+                    showLoginAlert('Please enter your administrator email.', 'error');
+                    return;
+                }
+
+                recoverySubmitBtn.disabled = true;
+                recoveryBtnText.textContent = 'Sending...';
+
+                try {
+                    const res = await fetch('/api/admin/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'recover', email })
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok && data.success) {
+                        showLoginAlert('Password recovery link has been dispatched to your email.', 'success');
+                        recoveryForm.reset();
+                    } else {
+                        showLoginAlert(data.message || 'Password reset request failed.', 'error');
+                    }
+                } catch (netErr) {
+                    showLoginAlert('Failed to dispatch recovery request. Please try again.', 'error');
+                } finally {
+                    recoverySubmitBtn.disabled = false;
+                    recoveryBtnText.textContent = 'Send Recovery Link';
+                }
+            });
+        }
+
+        // Logout
+        logoutBtn.addEventListener('click', async () => {
+            const token = getAdminAuthToken();
+            if (token) {
+                fetch('/api/admin/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ action: 'logout' })
+                }).catch(() => {});
+            }
+            clearAdminSession();
+            showToast('Logged out successfully.', 'info');
+            loginWrapper.style.display = 'flex';
+            dashboardContainer.style.display = 'none';
+            if (mobileHeader) mobileHeader.style.display = 'none';
+            if (loginForm) loginForm.style.display = 'block';
+            if (recoveryForm) recoveryForm.style.display = 'none';
+            hideLoginAlert();
         });
 
         // Ensure switchInvoiceView exists early for zero-latency clicks
@@ -2573,7 +2811,7 @@
 
                 // Submissions / Leads (Supabase backend with offline fallback)
                 try {
-                    const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+                    const token = getAdminAuthToken() || 'shaivika_admin_2026';
                     const adminRes = await fetch('/api/admin/leads?page=1&limit=25', {
                         headers: { 'Authorization': `Bearer ${token}`, 'x-admin-key': token }
                     }).catch(() => null);
@@ -2864,7 +3102,7 @@
             }
 
             try {
-                const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+                const token = getAdminAuthToken() || 'shaivika_admin_2026';
                 const res = await fetch('/api/admin/leads', {
                     method: 'PATCH',
                     headers: {
@@ -2897,7 +3135,7 @@
             // Attempt server-side fetch from /api/admin/leads
             let fetchedFromServer = false;
             try {
-                const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+                const token = getAdminAuthToken() || 'shaivika_admin_2026';
                 const endpoint = `/api/admin/leads?page=${leadsCurrentPage}&limit=${leadsPageLimit}&status=${encodeURIComponent(statusFilter)}&search=${encodeURIComponent(searchQuery)}`;
                 const res = await fetch(endpoint, {
                     headers: {
@@ -3046,7 +3284,7 @@
 
         // Leads Export CSV (Supabase backend with fallback)
         document.getElementById('exportLeadsCsv')?.addEventListener('click', async () => {
-            const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+            const token = getAdminAuthToken() || 'shaivika_admin_2026';
             const status = document.getElementById('filterLeadStatus')?.value || 'all';
             const search = document.getElementById('searchLeads')?.value || '';
 
@@ -3105,7 +3343,7 @@
 
         // Leads Export JSON (Supabase backend with fallback)
         document.getElementById('exportLeadsJson')?.addEventListener('click', async () => {
-            const token = localStorage.getItem('shaivika_admin_token') || 'shaivika_admin_2026';
+            const token = getAdminAuthToken() || 'shaivika_admin_2026';
             const status = document.getElementById('filterLeadStatus')?.value || 'all';
             const search = document.getElementById('searchLeads')?.value || '';
 
@@ -4037,17 +4275,10 @@
         };
 
         // CHANGE PASSWORD FORM handler
-        document.getElementById('changePasswordForm')?.addEventListener('submit', (e) => {
+        document.getElementById('changePasswordForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const currentPass = document.getElementById('currentPass').value;
-            const newPass = document.getElementById('newPass').value;
-            const confirmPass = document.getElementById('confirmPass').value;
-            const storedPass = localStorage.getItem('shaivika_admin_password') || 'googlemanoj';
-
-            if (currentPass !== storedPass && currentPass !== 'adminpassword123' && currentPass !== 'googlemanoj') {
-                showToast('Current password is incorrect.', 'error');
-                return;
-            }
+            const newPass = document.getElementById('newPass')?.value;
+            const confirmPass = document.getElementById('confirmPass')?.value;
 
             if (!newPass || newPass.length < 8) {
                 showToast('New password must be at least 8 characters long.', 'error');
@@ -4059,9 +4290,27 @@
                 return;
             }
 
-            localStorage.setItem('shaivika_admin_password', newPass);
-            showToast('Admin password updated successfully!', 'success');
-            document.getElementById('changePasswordForm').reset();
+            const userStr = sessionStorage.getItem('shaivika_admin_user');
+            const user = userStr ? JSON.parse(userStr) : null;
+            if (user && user.email) {
+                try {
+                    const res = await fetch('/api/admin/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'recover', email: user.email })
+                    });
+                    if (res.ok) {
+                        showToast('Password recovery link sent to ' + user.email, 'success');
+                        window.closeModal?.('changePasswordModal');
+                        document.getElementById('changePasswordForm')?.reset();
+                        return;
+                    }
+                } catch (err) {}
+            }
+
+            showToast('Please use "Forgot password?" on login or Supabase Dashboard to update passwords.', 'info');
+            window.closeModal?.('changePasswordModal');
+            document.getElementById('changePasswordForm')?.reset();
         });
 
         // RESET TO DEFAULT BASELINE handler

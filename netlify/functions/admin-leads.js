@@ -12,31 +12,9 @@
  */
 
 const { isSupabaseConfigured, getLeads, updateLeadStatus } = require('./utils/supabase');
+const { verifyAdminRequest } = require('./utils/auth');
 
 const VALID_STATUSES = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];
-
-/**
- * Validate admin credentials from request headers
- */
-function verifyAdminAuth(headers) {
-  const authHeader = headers['authorization'] || headers['Authorization'] || '';
-  const xAdminKey = headers['x-admin-key'] || headers['X-Admin-Key'] || '';
-
-  let token = '';
-  if (authHeader.startsWith('Bearer ')) {
-    token = authHeader.substring(7).trim();
-  } else if (authHeader) {
-    token = authHeader.trim();
-  } else if (xAdminKey) {
-    token = xAdminKey.trim();
-  }
-
-  const expectedKey = process.env.ADMIN_KEY || process.env.ADMIN_PASSWORD || 'shaivika_admin_2026';
-  const legacyFallbackKeys = ['googlemanoj', 'adminpassword123', 'admin123', 'shaivika_admin_2026'];
-
-  if (!token) return false;
-  return token === expectedKey || legacyFallbackKeys.includes(token);
-}
 
 /**
  * Sanitize lead record for admin display & export (strip internal fields like ip_hash)
@@ -113,14 +91,16 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Security Check: Authenticate Admin
-  if (!verifyAdminAuth(event.headers)) {
+  // Security Check: Authenticate Admin (Supabase Auth JWT or ADMIN_KEY)
+  const authResult = await verifyAdminRequest(event.headers);
+  if (!authResult.authorized) {
     return {
       statusCode: 401,
       headers: corsHeaders,
       body: JSON.stringify({
         success: false,
-        message: 'Unauthorized. Valid admin credentials required.'
+        message: 'Unauthorized. Valid administrator credentials required.',
+        reason: authResult.reason
       })
     };
   }

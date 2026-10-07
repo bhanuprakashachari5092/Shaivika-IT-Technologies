@@ -67,3 +67,30 @@ EXECUTE FUNCTION public.set_current_timestamp_updated_at();
 
 -- Comment for table documentation
 COMMENT ON TABLE public.leads IS 'Production lead generation and project inquiry records for SHAIVIKA IT TECHNOLOGIES';
+
+-- ============================================================================
+-- 7. Administrator Authorization Table (public.admin_users)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.admin_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL UNIQUE,
+    email TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'admin',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT admin_role_check CHECK (role IN ('admin', 'super_admin'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_users_user_id ON public.admin_users(user_id);
+CREATE INDEX IF NOT EXISTS idx_admin_users_email ON public.admin_users(email);
+
+-- Enable Row Level Security (RLS) on admin_users
+ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
+
+-- Revoke all direct anonymous and authenticated access from clients
+REVOKE ALL ON public.admin_users FROM anon;
+REVOKE ALL ON public.admin_users FROM authenticated;
+
+-- Allow only service_role to manage admin_users
+GRANT ALL ON public.admin_users TO service_role;
+
+COMMENT ON TABLE public.admin_users IS 'Authorized administrators with permission to access the leads dashboard';
