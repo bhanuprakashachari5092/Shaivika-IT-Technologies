@@ -1,17 +1,22 @@
 /**
- * SHAIVIKA IT TECHNOLOGIES — LEAD EMAIL NOTIFICATION UTILITY
+ * SHAIVIKA IT TECHNOLOGIES — GMAIL SMTP LEAD NOTIFICATION SYSTEM
  * 
  * Automates professional HTML email alerts to SHAIVIKA IT TECHNOLOGIES admin
+ * (shaivikagroups@gmail.com) via Gmail SMTP (smtp.gmail.com:465 SSL/TLS)
  * whenever a new lead is stored in Supabase PostgreSQL.
  *
- * Implements:
- * - HTML escaping for all user inputs (anti-XSS / anti-injection)
- * - Safe fallback handling when RESEND_API_KEY is not configured
- * - Database-first guarantee: email failures never fail lead persistence
- * - Zero secrets or internal infrastructure tokens in email or logs
+ * Requirements & Architecture:
+ * - Server-side only (Netlify Functions) using nodemailer
+ * - Authenticated with Gmail App Password (SMTP_PASS)
+ * - HTML escaping for all user inputs (anti-XSS / anti-HTML injection)
+ * - Safe fallback handling when SMTP_PASS is missing
+ * - Database-first guarantee: email failures NEVER delete or fail lead persistence
+ * - Zero secrets or internal credentials in emails, API responses, or logs
  * - Dynamic subject line: "New Project Inquiry — {{company/name}}"
  * - Direct CTA to Admin CRM via ADMIN_DASHBOARD_URL
  */
+
+const nodemailer = require('nodemailer');
 
 /**
  * Escapes characters for safe HTML injection
@@ -30,15 +35,22 @@ function escapeHtml(str) {
 
 /**
  * Generates email subject line:
- * "New Project Inquiry — {{company/name}}"
+ * "New Project Inquiry — {{company}}"
+ * If company is empty:
+ * "New Project Inquiry — {{name}}"
  * @param {object} lead 
  * @returns {string}
  */
 function generateLeadSubject(lead) {
   const company = (lead.company || '').trim();
   const name = (lead.name || '').trim();
-  const target = company || name || 'New Client';
-  return `New Project Inquiry — ${target}`;
+  if (company) {
+    return `New Project Inquiry — ${company}`;
+  }
+  if (name) {
+    return `New Project Inquiry — ${name}`;
+  }
+  return 'New Project Inquiry — New Client';
 }
 
 /**
@@ -281,57 +293,154 @@ Open Admin CRM: ${adminUrl}
 }
 
 /**
- * Sends the lead notification to the admin via Resend API
- * @param {object} lead - The stored lead record
- * @returns {Promise<{ success: boolean, message?: string, error?: string }>}
+ * Creates a nodemailer transporter for Gmail SMTP using SSL/TLS (port 465)
+ * @returns {object|null}
  */
-async function sendLeadNotification(lead) {
-  const apiKey = process.env.RESEND_API_KEY;
+function createSmtpTransporter() {
+  const user = process.env.SMTP_USER || 'shaivikagroups@gmail.com';
+  const pass = process.env.SMTP_PASS;
 
-  if (!apiKey) {
-    console.info(`[Leads API] Lead ${lead.id} stored in Supabase. Email notification skipped (RESEND_API_KEY not configured).`);
-    return { success: false, message: 'RESEND_API_KEY_NOT_CONFIGURED' };
+  if (!pass) {
+    return null;
   }
 
-  const toEmail = process.env.LEAD_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL || 'shaivikagroups@gmail.com';
-  const fromEmail = process.env.LEAD_FROM_EMAIL || process.env.EMAIL_FROM || 'SHAIVIKA IT TECHNOLOGIES <onboarding@resend.dev>';
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = Number(process.env.SMTP_PORT || 465);
+  const secure = process.env.SMTP_SECURE !== 'false';
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: {
+      user,
+      pass
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 5000,
+    socketTimeout: 10000
+  });
+}
+
+/**
+ * Safe server-side SMTP verification helper for diagnostics / test suites.
+ * Never exposed via public HTTP endpoints.
+ * @returns {Promise<{ success: boolean, message?: string, error?: string }>}
+ */
+async function verifySmtpConnection() {
+  const user = process.env.SMTP_USER || 'shaivikagroups@gmail.com';
+  const pass = process.env.SMTP_PASS;
+
+  if (!pass) {
+    return {
+      success: false,
+      error: 'SMTP_NOT_CONFIGURED',
+      message: 'SMTP_PASS environment variable is missing.'
+    };
+  }
+
+  try {
+    const transporter = createSmtpTransporter();
+    if (!transporter) {
+      return { success: false, error: 'TRANS_CREATE_FAILED' };
+    }
+    await transporter.verify();
+    return {
+      success: true,
+      message: `SMTP connection to ${process.env.SMTP_HOST || 'smtp.gmail.com'} verified for ${user}.`
+    };
+  } catch (err) {
+    const safeError = err.message ? err.message.replace(/[\r\n]+/g, ' ').slice(0, 150) : 'Verification failed';
+    return { success: false, error: safeError };
+  }
+}
+
+/**
+ * Sends the lead notification to the admin.
+ * Uses Gmail SMTP (nodemailer) as the primary provider.
+ * Falls back to Resend API if RESEND_API_KEY is configured and SMTP_PASS is omitted.
+ * If neither is configured, logs safely and skips email without affecting lead storage.
+ * 
+ * @param {object} lead - The stored lead record
+ * @returns {Promise<{ success: boolean, message?: string, error?: string, provider?: string }>}
+ */
+async function sendLeadNotification(lead) {
+  const smtpPass = process.env.SMTP_PASS;
+  const smtpUser = process.env.SMTP_USER || 'shaivikagroups@gmail.com';
+  const toEmail = process.env.LEAD_NOTIFICATION_EMAIL || 'shaivikagroups@gmail.com';
 
   const { subject, html, text } = buildLeadNotificationEmail(lead);
 
-  try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: fromEmail,
+  // 1. PRIMARY: Gmail SMTP via nodemailer
+  if (smtpPass) {
+    try {
+      const transporter = createSmtpTransporter();
+      if (!transporter) {
+        console.info(`[Leads API] Lead ${lead.id || 'N/A'} saved; email notification unavailable because SMTP is not configured.`);
+        return { success: false, message: 'SMTP_NOT_CONFIGURED' };
+      }
+
+      await transporter.sendMail({
+        from: `SHAIVIKA IT TECHNOLOGIES <${smtpUser}>`,
         to: toEmail,
         subject,
         html,
         text
-      })
-    });
+      });
 
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      const errMsg = errBody.message || `Resend HTTP error ${res.status}`;
-      console.error(`[Leads API] Lead ${lead.id} saved successfully; email notification failed: ${errMsg}`);
-      return { success: false, error: errMsg };
+      console.info(`[Leads API] Gmail notification sent successfully for lead ${lead.id}`);
+      return { success: true, provider: 'gmail_smtp' };
+    } catch (smtpErr) {
+      const safeErrorMsg = smtpErr.message ? smtpErr.message.replace(/[\r\n]+/g, ' ').slice(0, 150) : 'SMTP dispatch error';
+      console.error(`[Leads API] Lead ${lead.id} saved but Gmail notification failed: ${safeErrorMsg}`);
+      return { success: false, error: safeErrorMsg };
     }
-
-    console.info(`[Leads API] Lead notification sent successfully for lead ${lead.id}`);
-    return { success: true };
-  } catch (err) {
-    console.error('[Leads API] Email dispatch failed (Lead stored safely in Supabase):', err.message);
-    return { success: false, error: err.message };
   }
+
+  // 2. SECONDARY: Resend API (Fallback if configured)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const fromEmail = process.env.LEAD_FROM_EMAIL || process.env.EMAIL_FROM || 'SHAIVIKA IT TECHNOLOGIES <onboarding@resend.dev>';
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: toEmail,
+          subject,
+          html,
+          text
+        })
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        const errMsg = errBody.message || `Resend HTTP error ${res.status}`;
+        console.error(`[Leads API] Lead ${lead.id} saved successfully; email notification failed: ${errMsg}`);
+        return { success: false, error: errMsg };
+      }
+
+      console.info(`[Leads API] Lead notification sent successfully for lead ${lead.id}`);
+      return { success: true, provider: 'resend' };
+    } catch (resendErr) {
+      console.error('[Leads API] Email dispatch failed (Lead stored safely in Supabase):', resendErr.message);
+      return { success: false, error: resendErr.message };
+    }
+  }
+
+  // 3. Neither SMTP nor Resend is configured
+  console.info(`[Leads API] Lead ${lead.id || 'N/A'} saved; email notification unavailable because SMTP is not configured.`);
+  return { success: false, message: 'SMTP_NOT_CONFIGURED' };
 }
 
 module.exports = {
   escapeHtml,
   generateLeadSubject,
   buildLeadNotificationEmail,
+  createSmtpTransporter,
+  verifySmtpConnection,
   sendLeadNotification
 };

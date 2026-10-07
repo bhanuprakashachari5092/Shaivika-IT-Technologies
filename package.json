@@ -1,0 +1,16 @@
+{
+  "name": "shaivika-it-technologies",
+  "version": "1.0.0",
+  "description": "SHAIVIKA IT TECHNOLOGIES — Enterprise Website & Lead CRM",
+  "private": true,
+  "main": "netlify/functions/leads.js",
+  "scripts": {
+    "test:leads": "node scratch/test_leads_suite.cjs",
+    "test:security": "node scratch/test_admin_security_hardened.cjs",
+    "test:crm": "node scratch/test_crm_suite.cjs",
+    "test:email": "node scratch/test_email_notifications.cjs"
+  },
+  "dependencies": {
+    "nodemailer": "^10.0.15"
+  }
+}
