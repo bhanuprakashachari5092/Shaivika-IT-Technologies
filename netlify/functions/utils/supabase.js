@@ -405,6 +405,266 @@ async function updateLeadStatus(id, newStatus) {
   return updateLeadCrm(id, { status: newStatus });
 }
 
+// ============================================================================
+// STEP 6: PROPOSALS & QUOTATIONS CRM ENGINE
+// ============================================================================
+
+const VALID_CURRENCIES = ['INR', 'USD', 'GBP', 'EUR', 'AED', 'AUD'];
+const VALID_PROPOSAL_STATUSES = ['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired'];
+
+/**
+ * Generate unique server-side sequential proposal number (e.g. SIT-2026-0001)
+ */
+async function generateNextProposalNumber() {
+  const { url, serviceKey, isConfigured } = getSupabaseConfig();
+  const year = new Date().getFullYear();
+  const prefix = `SIT-${year}-`;
+
+  if (!isConfigured) {
+    const randomSeq = Math.floor(1000 + Math.random() * 9000);
+    return `${prefix}${randomSeq}`;
+  }
+
+  try {
+    const endpoint = `${url}/rest/v1/proposals?proposal_number=like.${encodeURIComponent(prefix + '*')}&select=proposal_number&order=proposal_number.desc&limit=50`;
+    const res = await fetch(endpoint, {
+      headers: getAuthHeaders(serviceKey)
+    });
+
+    if (res.ok) {
+      const rows = await res.json();
+      let maxNum = 0;
+      if (Array.isArray(rows)) {
+        for (const row of rows) {
+          const numStr = (row.proposal_number || '').replace(prefix, '');
+          const parsed = parseInt(numStr, 10);
+          if (!isNaN(parsed) && parsed > maxNum) {
+            maxNum = parsed;
+          }
+        }
+      }
+      const nextSeq = maxNum + 1;
+      return `${prefix}${String(nextSeq).padStart(4, '0')}`;
+    }
+  } catch (err) {
+    console.warn('[Supabase REST] Error fetching next proposal number, generating fallback:', err.message);
+  }
+
+  return `${prefix}0001`;
+}
+
+/**
+ * Create a new commercial proposal linked to a lead
+ */
+async function createProposal(data) {
+  const { url, serviceKey, isConfigured } = getSupabaseConfig();
+  if (!isConfigured) {
+    throw new Error('SUPABASE_NOT_CONFIGURED');
+  }
+
+  if (!data.lead_id) {
+    throw new Error('VALIDATION_ERROR: lead_id is required');
+  }
+  if (!data.title || typeof data.title !== 'string' || data.title.trim().length < 3) {
+    throw new Error('VALIDATION_ERROR: title must be at least 3 characters');
+  }
+
+  const amount = Number(data.amount);
+  if (isNaN(amount) || amount < 0) {
+    throw new Error('VALIDATION_ERROR: amount must be a positive number');
+  }
+
+  const currency = (data.currency || 'INR').toUpperCase();
+  if (!VALID_CURRENCIES.includes(currency)) {
+    throw new Error(`VALIDATION_ERROR: currency must be one of ${VALID_CURRENCIES.join(', ')}`);
+  }
+
+  const status = data.status || 'Draft';
+  if (!VALID_PROPOSAL_STATUSES.includes(status)) {
+    throw new Error(`VALIDATION_ERROR: status must be one of ${VALID_PROPOSAL_STATUSES.join(', ')}`);
+  }
+
+  const proposalNumber = data.proposal_number || await generateNextProposalNumber();
+
+  const payload = {
+    lead_id: data.lead_id,
+    proposal_number: proposalNumber,
+    title: data.title.trim(),
+    scope: data.scope || '',
+    deliverables: data.deliverables || '',
+    timeline: data.timeline || '',
+    amount,
+    currency,
+    payment_terms: data.payment_terms || '50% Advance on project kickoff, 50% upon final acceptance & deployment.',
+    valid_until: data.valid_until || null,
+    additional_notes: data.additional_notes || '',
+    status,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  const endpoint = `${url}/rest/v1/proposals`;
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: getAuthHeaders(serviceKey, {
+      'Prefer': 'return=representation'
+    }),
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    console.error('[Supabase REST] Create proposal error:', res.status, errText);
+    throw new Error(`DATABASE_CREATE_PROPOSAL_FAILED: ${res.status}`);
+  }
+
+  const inserted = await res.json();
+  const createdRecord = Array.isArray(inserted) && inserted.length > 0 ? inserted[0] : payload;
+
+  // Automatically advance lead status to 'Proposal' per CRM workflow specification
+  try {
+    await updateLeadCrm(data.lead_id, { status: 'proposal' });
+  } catch (leadUpdateErr) {
+    console.warn('[Supabase REST] Failed to auto-update lead status to proposal:', leadUpdateErr.message);
+  }
+
+  return createdRecord;
+}
+
+/**
+ * Fetch proposals with optional filters
+ */
+async function getProposals(filters = {}) {
+  const { url, serviceKey, isConfigured } = getSupabaseConfig();
+  if (!isConfigured) return [];
+
+  let query = 'select=*&order=created_at.desc';
+  if (filters.lead_id) {
+    query += `&lead_id=eq.${encodeURIComponent(filters.lead_id)}`;
+  }
+  if (filters.status) {
+    query += `&status=eq.${encodeURIComponent(filters.status)}`;
+  }
+  if (filters.limit) {
+    query += `&limit=${Number(filters.limit)}`;
+  }
+
+  const endpoint = `${url}/rest/v1/proposals?${query}`;
+  const res = await fetch(endpoint, {
+    headers: getAuthHeaders(serviceKey)
+  });
+
+  if (!res.ok) {
+    throw new Error(`DATABASE_GET_PROPOSALS_FAILED: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * Get single proposal by ID or proposal_number, with attached lead data
+ */
+async function getProposalById(id) {
+  const { url, serviceKey, isConfigured } = getSupabaseConfig();
+  if (!isConfigured) return null;
+
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  const filter = isUuid ? `id=eq.${encodeURIComponent(id)}` : `proposal_number=eq.${encodeURIComponent(id)}`;
+
+  const endpoint = `${url}/rest/v1/proposals?${filter}&limit=1`;
+  const res = await fetch(endpoint, {
+    headers: getAuthHeaders(serviceKey)
+  });
+
+  if (!res.ok) return null;
+  const rows = await res.json();
+  if (!Array.isArray(rows) || rows.length === 0) return null;
+
+  const proposal = rows[0];
+
+  // Attach linked lead details
+  if (proposal.lead_id) {
+    try {
+      const leadRes = await fetch(`${url}/rest/v1/leads?id=eq.${encodeURIComponent(proposal.lead_id)}&limit=1`, {
+        headers: getAuthHeaders(serviceKey)
+      });
+      if (leadRes.ok) {
+        const leadRows = await leadRes.json();
+        if (Array.isArray(leadRows) && leadRows.length > 0) {
+          proposal.lead = leadRows[0];
+        }
+      }
+    } catch {
+      // Non-fatal
+    }
+  }
+
+  return proposal;
+}
+
+/**
+ * Update an existing proposal
+ */
+async function updateProposal(id, updates = {}) {
+  const { url, serviceKey, isConfigured } = getSupabaseConfig();
+  if (!isConfigured) {
+    throw new Error('SUPABASE_NOT_CONFIGURED');
+  }
+
+  const allowedFields = [
+    'title', 'scope', 'deliverables', 'timeline', 'amount',
+    'currency', 'payment_terms', 'valid_until', 'additional_notes', 'status', 'sent_at'
+  ];
+
+  const payload = {};
+  for (const field of allowedFields) {
+    if (updates[field] !== undefined) {
+      payload[field] = updates[field];
+    }
+  }
+
+  if (payload.amount !== undefined) {
+    const amountNum = Number(payload.amount);
+    if (isNaN(amountNum) || amountNum < 0) {
+      throw new Error('VALIDATION_ERROR: amount must be a positive number');
+    }
+    payload.amount = amountNum;
+  }
+
+  if (payload.currency !== undefined) {
+    payload.currency = String(payload.currency).toUpperCase();
+    if (!VALID_CURRENCIES.includes(payload.currency)) {
+      throw new Error(`VALIDATION_ERROR: currency must be one of ${VALID_CURRENCIES.join(', ')}`);
+    }
+  }
+
+  if (payload.status !== undefined) {
+    if (!VALID_PROPOSAL_STATUSES.includes(payload.status)) {
+      throw new Error(`VALIDATION_ERROR: status must be one of ${VALID_PROPOSAL_STATUSES.join(', ')}`);
+    }
+  }
+
+  payload.updated_at = new Date().toISOString();
+
+  const endpoint = `${url}/rest/v1/proposals?id=eq.${encodeURIComponent(id)}`;
+  const res = await fetch(endpoint, {
+    method: 'PATCH',
+    headers: getAuthHeaders(serviceKey, {
+      'Prefer': 'return=representation'
+    }),
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    console.error('[Supabase REST] Update proposal error:', res.status, errText);
+    throw new Error(`DATABASE_UPDATE_PROPOSAL_FAILED: ${res.status}`);
+  }
+
+  const updatedRows = await res.json();
+  return Array.isArray(updatedRows) && updatedRows.length > 0 ? updatedRows[0] : null;
+}
+
 module.exports = {
   isSupabaseConfigured,
   insertLead,
@@ -415,5 +675,12 @@ module.exports = {
   updateLeadStatus,
   hashIp,
   VALID_STATUSES,
-  VALID_PRIORITIES
+  VALID_PRIORITIES,
+  VALID_CURRENCIES,
+  VALID_PROPOSAL_STATUSES,
+  generateNextProposalNumber,
+  createProposal,
+  getProposals,
+  getProposalById,
+  updateProposal
 };

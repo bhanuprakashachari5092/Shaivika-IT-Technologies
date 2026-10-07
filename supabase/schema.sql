@@ -134,3 +134,50 @@ CREATE INDEX IF NOT EXISTS idx_leads_priority ON public.leads(priority);
 CREATE INDEX IF NOT EXISTS idx_leads_next_follow_up ON public.leads(next_follow_up);
 CREATE INDEX IF NOT EXISTS idx_leads_last_contacted_at ON public.leads(last_contacted_at);
 
+-- ============================================================================
+-- 9. STEP 6 Proposal / Quotation Workflow (public.proposals)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.proposals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    lead_id UUID NOT NULL REFERENCES public.leads(id) ON DELETE CASCADE,
+    proposal_number TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
+    scope TEXT,
+    deliverables TEXT,
+    timeline TEXT,
+    amount NUMERIC NOT NULL CHECK (amount >= 0),
+    currency TEXT NOT NULL DEFAULT 'INR' CHECK (currency IN ('INR', 'USD', 'GBP', 'EUR', 'AED', 'AUD')),
+    payment_terms TEXT,
+    valid_until DATE,
+    additional_notes TEXT,
+    status TEXT NOT NULL DEFAULT 'Draft' CHECK (status IN ('Draft', 'Sent', 'Accepted', 'Rejected', 'Expired')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    sent_at TIMESTAMPTZ
+);
+
+-- High-performance indexes for proposal queries
+CREATE INDEX IF NOT EXISTS idx_proposals_lead_id ON public.proposals(lead_id);
+CREATE INDEX IF NOT EXISTS idx_proposals_status ON public.proposals(status);
+CREATE INDEX IF NOT EXISTS idx_proposals_proposal_number ON public.proposals(proposal_number);
+CREATE INDEX IF NOT EXISTS idx_proposals_created_at ON public.proposals(created_at DESC);
+
+-- Automatic updated_at trigger for proposals
+DROP TRIGGER IF EXISTS trg_proposals_updated_at ON public.proposals;
+CREATE TRIGGER trg_proposals_updated_at
+    BEFORE UPDATE ON public.proposals
+    FOR EACH ROW
+    EXECUTE FUNCTION public.set_current_timestamp_updated_at();
+
+-- Enable Row Level Security (RLS) on proposals
+ALTER TABLE public.proposals ENABLE ROW LEVEL SECURITY;
+
+-- Revoke all direct anonymous and authenticated access from clients
+REVOKE ALL ON public.proposals FROM anon;
+REVOKE ALL ON public.proposals FROM authenticated;
+
+-- Allow only service_role to manage proposals
+GRANT ALL ON public.proposals TO service_role;
+
+COMMENT ON TABLE public.proposals IS 'Commercial proposals and quotations linked to CRM leads';
+

@@ -436,11 +436,265 @@ async function sendLeadNotification(lead) {
   return { success: false, message: 'SMTP_NOT_CONFIGURED' };
 }
 
+// ============================================================================
+// STEP 6: COMMERCIAL PROPOSAL EMAIL & PDF ATTACHMENT DISPATCH
+// ============================================================================
+
+/**
+ * Format currency with symbols for proposal email
+ */
+function formatProposalCurrency(amount, currency = 'INR') {
+  const num = Number(amount) || 0;
+  const curr = (currency || 'INR').toUpperCase();
+  const symbols = {
+    'INR': '₹ ',
+    'USD': '$ ',
+    'GBP': '£ ',
+    'EUR': '€ ',
+    'AED': 'AED ',
+    'AUD': 'A$ '
+  };
+  const sym = symbols[curr] || `${curr} `;
+  return `${sym}${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/**
+ * Builds HTML and text email for sending proposals to clients
+ */
+function buildProposalEmail(proposal, lead = {}) {
+  const title = (proposal.title || 'Project Proposal').trim();
+  const subject = `Proposal from SHAIVIKA IT TECHNOLOGIES — ${title}`;
+
+  const clientName = escapeHtml(lead.name || 'Valued Client');
+  const clientCompany = escapeHtml(lead.company || '');
+  const proposalNumber = escapeHtml(proposal.proposal_number || 'SIT-2026');
+  const escapedTitle = escapeHtml(title);
+  const formattedAmount = escapeHtml(formatProposalCurrency(proposal.amount, proposal.currency));
+  const timeline = escapeHtml(proposal.timeline || 'Flexible');
+  const validUntil = escapeHtml(proposal.valid_until ? formatDisplayDate(proposal.valid_until).replace(/\s\d\d:.*$/, '') : 'Upon Discussion');
+  const paymentTerms = escapeHtml(proposal.payment_terms || 'Standard terms as outlined in the proposal document.');
+  const scope = escapeHtml(proposal.scope || lead.description || 'Full development and delivery as discussed.');
+
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(subject)}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0B0F19; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #F3F4F6;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #0B0F19; padding: 32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 620px; background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);">
+
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%); padding: 32px 28px; border-bottom: 1px solid rgba(37, 99, 235, 0.3);">
+              <div style="font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; color: #38BDF8; text-transform: uppercase; margin-bottom: 6px;">
+                SHAIVIKA IT TECHNOLOGIES
+              </div>
+              <h1 style="margin: 0; font-size: 1.45rem; font-weight: 700; color: #FFFFFF; line-height: 1.3;">
+                Commercial Project Proposal
+              </h1>
+              <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 6px;">
+                Reference: <code style="color: #38BDF8; font-weight: 600;">${proposalNumber}</code>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 28px;">
+              <p style="margin: 0 0 16px 0; font-size: 0.95rem; line-height: 1.6; color: #E5E7EB;">
+                Dear <strong>${clientName}</strong>${clientCompany ? ` (${clientCompany})` : ''},
+              </p>
+              <p style="margin: 0 0 20px 0; font-size: 0.92rem; line-height: 1.6; color: #D1D5DB;">
+                Thank you for considering <strong>SHAIVIKA IT TECHNOLOGIES</strong>. Following our review of your requirements, we are pleased to present our official commercial proposal for <strong>${escapedTitle}</strong>.
+              </p>
+
+              <!-- Proposal Highlights Box -->
+              <div style="background: #1F2937; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px; margin-bottom: 24px;">
+                <h3 style="margin: 0 0 14px 0; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; color: #38BDF8; font-weight: 700;">
+                  📋 Proposal Summary
+                </h3>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td style="padding: 6px 0; font-size: 0.88rem; color: #94A3B8; width: 40%;">Project Title:</td>
+                    <td style="padding: 6px 0; font-size: 0.88rem; color: #FFFFFF; font-weight: 600;">${escapedTitle}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 6px 0; font-size: 0.88rem; color: #94A3B8;">Total Investment:</td>
+                    <td style="padding: 6px 0; font-size: 1rem; color: #10B981; font-weight: 700;">${formattedAmount}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 6px 0; font-size: 0.88rem; color: #94A3B8;">Target Timeline:</td>
+                    <td style="padding: 6px 0; font-size: 0.88rem; color: #FFFFFF;">${timeline}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 6px 0; font-size: 0.88rem; color: #94A3B8;">Proposal Validity:</td>
+                    <td style="padding: 6px 0; font-size: 0.88rem; color: #FFFFFF;">${validUntil}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Scope & Deliverables Preview -->
+              <div style="margin-bottom: 24px;">
+                <h3 style="margin: 0 0 10px 0; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; color: #A855F7; font-weight: 700;">
+                  🚀 Project Scope Overview
+                </h3>
+                <div style="background: #0F172A; border-left: 4px solid #38BDF8; padding: 14px; border-radius: 8px; color: #E5E7EB; font-size: 0.88rem; line-height: 1.6; white-space: pre-wrap;">${scope}</div>
+              </div>
+
+              <!-- Payment Terms -->
+              <div style="margin-bottom: 24px;">
+                <h3 style="margin: 0 0 8px 0; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; color: #F59E0B; font-weight: 700;">
+                  💳 Payment Structure
+                </h3>
+                <div style="font-size: 0.88rem; color: #D1D5DB; line-height: 1.5;">${paymentTerms}</div>
+              </div>
+
+              <!-- Attachment Callout -->
+              <div style="background: rgba(37, 99, 235, 0.12); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: 10px; padding: 14px; margin-bottom: 24px; text-align: center;">
+                <div style="font-size: 0.92rem; font-weight: 600; color: #38BDF8; margin-bottom: 4px;">
+                  📎 PDF Quotation Attached
+                </div>
+                <div style="font-size: 0.82rem; color: #94A3B8;">
+                  Please find the detailed commercial proposal document (<code>Proposal-${proposalNumber}.pdf</code>) attached to this email.
+                </div>
+              </div>
+
+              <!-- Next Steps -->
+              <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 18px; margin-bottom: 8px;">
+                <p style="margin: 0 0 12px 0; font-size: 0.88rem; color: #94A3B8; line-height: 1.5;">
+                  To accept this proposal or discuss any adjustments, please reply directly to this email or contact us at <a href="mailto:shaivikagroups@gmail.com" style="color: #38BDF8; text-decoration: none;">shaivikagroups@gmail.com</a>.
+                </p>
+                <p style="margin: 0; font-size: 0.9rem; color: #FFFFFF; font-weight: 600;">
+                  Best regards,<br>
+                  <span style="color: #38BDF8; font-weight: 700;">SHAIVIKA IT TECHNOLOGIES</span><br>
+                  <span style="font-size: 0.78rem; color: #94A3B8; font-weight: 400;">AI • SaaS • Software Engineering • Digital Transformation</span><br>
+                  <a href="https://shaivikaittechnologies.in/" style="color: #38BDF8; font-size: 0.78rem; text-decoration: none;">https://shaivikaittechnologies.in/</a>
+                </p>
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #0B0F19; padding: 18px 28px; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center; font-size: 0.75rem; color: #64748B; line-height: 1.5;">
+              This commercial proposal is strictly confidential. &copy; ${new Date().getFullYear()} SHAIVIKA IT TECHNOLOGIES. All rights reserved.
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+
+  const text = `
+==================================================
+SHAIVIKA IT TECHNOLOGIES — COMMERCIAL PROPOSAL
+==================================================
+
+Proposal Reference: ${proposal.proposal_number || 'SIT-2026'}
+Date: ${formatDisplayDate(proposal.created_at || new Date())}
+
+Dear ${lead.name || 'Valued Client'}${lead.company ? ` (${lead.company})` : ''},
+
+Thank you for considering SHAIVIKA IT TECHNOLOGIES. Please find below the summary of your commercial proposal for "${title}".
+
+PROPOSAL SUMMARY:
+• Project Title: ${title}
+• Total Investment: ${formatProposalCurrency(proposal.amount, proposal.currency)}
+• Target Timeline: ${proposal.timeline || 'Flexible'}
+• Proposal Validity: ${validUntil}
+• Payment Terms: ${proposal.payment_terms || 'Standard terms as agreed.'}
+
+PROJECT SCOPE:
+${proposal.scope || lead.description || 'Full development and delivery as discussed.'}
+
+ATTACHMENT:
+Your complete, detailed PDF proposal has been attached to this email as "Proposal-${proposal.proposal_number || 'SIT'}.pdf".
+
+To accept this proposal or discuss modifications, please reply directly to this email or contact us at shaivikagroups@gmail.com.
+
+Best regards,
+SHAIVIKA IT TECHNOLOGIES
+AI • SaaS • Software Engineering • Digital Transformation
+https://shaivikaittechnologies.in/
+==================================================
+  `.trim();
+
+  return { subject, html, text };
+}
+
+/**
+ * Sends proposal email with attached PDF to the client via Gmail SMTP
+ * @param {object} proposal - The stored proposal record
+ * @param {object} lead - Linked lead record
+ * @param {Buffer} pdfBuffer - Binary buffer of the proposal PDF
+ * @returns {Promise<{ success: boolean, message?: string, error?: string }>}
+ */
+async function sendProposalEmail(proposal, lead, pdfBuffer) {
+  const smtpPass = process.env.SMTP_PASS;
+  const smtpUser = process.env.SMTP_USER || 'shaivikagroups@gmail.com';
+
+  if (!smtpPass) {
+    console.warn(`[Proposals API] Proposal ${proposal.proposal_number} email skipped (SMTP_PASS not configured).`);
+    return { success: false, error: 'SMTP_NOT_CONFIGURED', message: 'Gmail SMTP credentials are not configured.' };
+  }
+
+  const toEmail = (lead && lead.email ? lead.email : '').trim();
+  if (!toEmail || !toEmail.includes('@')) {
+    return { success: false, error: 'INVALID_CLIENT_EMAIL', message: 'Lead has no valid email address to receive proposal.' };
+  }
+
+  const transporter = createSmtpTransporter();
+  if (!transporter) {
+    return { success: false, error: 'TRANS_CREATE_FAILED', message: 'Failed to initialize Gmail SMTP transporter.' };
+  }
+
+  const { subject, html, text } = buildProposalEmail(proposal, lead);
+  const pdfFilename = `Proposal-${proposal.proposal_number || 'SIT'}.pdf`;
+
+  try {
+    const info = await transporter.sendMail({
+      from: `SHAIVIKA IT TECHNOLOGIES <${smtpUser}>`,
+      to: toEmail,
+      replyTo: process.env.LEAD_NOTIFICATION_EMAIL || smtpUser,
+      subject,
+      html,
+      text,
+      attachments: [
+        {
+          filename: pdfFilename,
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        }
+      ]
+    });
+
+    console.info(`[Proposals API] Proposal ${proposal.proposal_number} emailed successfully to ${toEmail}`);
+    return { success: true, messageId: info.messageId };
+  } catch (err) {
+    const safeErrorMsg = err.message ? err.message.replace(/[\r\n]+/g, ' ').slice(0, 150) : 'SMTP dispatch error';
+    console.error(`[Proposals API] Failed to email proposal ${proposal.proposal_number} to ${toEmail}: ${safeErrorMsg}`);
+    return { success: false, error: safeErrorMsg };
+  }
+}
+
 module.exports = {
   escapeHtml,
   generateLeadSubject,
   buildLeadNotificationEmail,
   createSmtpTransporter,
   verifySmtpConnection,
-  sendLeadNotification
+  sendLeadNotification,
+  buildProposalEmail,
+  sendProposalEmail
 };

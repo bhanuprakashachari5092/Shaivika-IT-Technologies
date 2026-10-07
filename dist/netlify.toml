@@ -116,4 +116,14 @@
   to = "/.netlify/functions/admin-auth"
   status = 200
 
+[[redirects]]
+  from = "/api/admin/proposals/*"
+  to = "/.netlify/functions/admin-proposals"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/proposals"
+  to = "/.netlify/functions/admin-proposals"
+  status = 200
+
 
