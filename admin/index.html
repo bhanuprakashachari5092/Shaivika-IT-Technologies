@@ -1164,8 +1164,59 @@
                 </div>
             </section>
 
-            <!-- TAB 4: LEADS -->
+            <!-- TAB 4: LEADS CRM -->
             <section class="tab-content" id="leads-manager-tab">
+                <!-- CRM Pipeline & Follow-Up Metrics Header -->
+                <div class="crm-pipeline-container" style="margin-bottom: 24px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                        <h2 style="font-size:1.15rem; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+                            <span>🎯</span> Leads Pipeline &amp; CRM
+                        </h2>
+                        <div class="crm-followups-bar" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                            <button type="button" class="crm-alert-pill" data-followup="overdue" title="Click to filter overdue leads" style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:20px; font-size:0.8rem; font-weight:600; border:1px solid rgba(239,68,68,0.35); background:rgba(239,68,68,0.12); color:#ef4444; cursor:pointer;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Overdue: <strong id="crmCountOverdue">0</strong>
+                            </button>
+                            <button type="button" class="crm-alert-pill" data-followup="today" title="Click to filter leads due today" style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:20px; font-size:0.8rem; font-weight:600; border:1px solid rgba(245,158,11,0.35); background:rgba(245,158,11,0.12); color:#f59e0b; cursor:pointer;">
+                                <i class="fa-solid fa-calendar-day"></i> Due Today: <strong id="crmCountToday">0</strong>
+                            </button>
+                            <button type="button" class="crm-alert-pill" data-followup="upcoming" title="Click to filter upcoming follow-ups" style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:20px; font-size:0.8rem; font-weight:600; border:1px solid rgba(56,189,248,0.35); background:rgba(56,189,248,0.12); color:#38bdf8; cursor:pointer;">
+                                <i class="fa-solid fa-calendar-week"></i> Upcoming: <strong id="crmCountUpcoming">0</strong>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="crm-pipeline-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px;">
+                        <div class="crm-stage-card" data-stage="all" title="View all leads" style="background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:12px; padding:12px 14px; cursor:pointer; transition:transform 0.2s, border-color 0.2s;">
+                            <div style="font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">All Leads</div>
+                            <div id="crmCountAll" style="font-size:1.45rem; font-weight:700; color:var(--text-primary); margin-top:4px;">0</div>
+                        </div>
+                        <div class="crm-stage-card" data-stage="new" title="Filter by New" style="background:var(--bg-glass); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:12px 14px; cursor:pointer; transition:transform 0.2s, border-color 0.2s;">
+                            <div style="font-size:0.7rem; color:#38bdf8; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">✨ New</div>
+                            <div id="crmCountNew" style="font-size:1.45rem; font-weight:700; color:#38bdf8; margin-top:4px;">0</div>
+                        </div>
+                        <div class="crm-stage-card" data-stage="contacted" title="Filter by Contacted" style="background:var(--bg-glass); border:1px solid rgba(245,158,11,0.25); border-radius:12px; padding:12px 14px; cursor:pointer; transition:transform 0.2s, border-color 0.2s;">
+                            <div style="font-size:0.7rem; color:#f59e0b; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">📞 Contacted</div>
+                            <div id="crmCountContacted" style="font-size:1.45rem; font-weight:700; color:#f59e0b; margin-top:4px;">0</div>
+                        </div>
+                        <div class="crm-stage-card" data-stage="qualified" title="Filter by Qualified" style="background:var(--bg-glass); border:1px solid rgba(168,85,247,0.25); border-radius:12px; padding:12px 14px; cursor:pointer; transition:transform 0.2s, border-color 0.2s;">
+                            <div style="font-size:0.7rem; color:#a855f7; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">🎯 Qualified</div>
+                            <div id="crmCountQualified" style="font-size:1.45rem; font-weight:700; color:#a855f7; margin-top:4px;">0</div>
+                        </div>
+                        <div class="crm-stage-card" data-stage="proposal" title="Filter by Proposal" style="background:var(--bg-glass); border:1px solid rgba(99,102,241,0.25); border-radius:12px; padding:12px 14px; cursor:pointer; transition:transform 0.2s, border-color 0.2s;">
+                            <div style="font-size:0.7rem; color:#6366f1; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">📑 Proposal</div>
+                            <div id="crmCountProposal" style="font-size:1.45rem; font-weight:700; color:#6366f1; margin-top:4px;">0</div>
+                        </div>
+                        <div class="crm-stage-card" data-stage="won" title="Filter by Won" style="background:var(--bg-glass); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:12px 14px; cursor:pointer; transition:transform 0.2s, border-color 0.2s;">
+                            <div style="font-size:0.7rem; color:#10b981; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">🏆 Won</div>
+                            <div id="crmCountWon" style="font-size:1.45rem; font-weight:700; color:#10b981; margin-top:4px;">0</div>
+                        </div>
+                        <div class="crm-stage-card" data-stage="lost" title="Filter by Lost" style="background:var(--bg-glass); border:1px solid rgba(239,68,68,0.25); border-radius:12px; padding:12px 14px; cursor:pointer; transition:transform 0.2s, border-color 0.2s;">
+                            <div style="font-size:0.7rem; color:#ef4444; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">❌ Lost</div>
+                            <div id="crmCountLost" style="font-size:1.45rem; font-weight:700; color:#ef4444; margin-top:4px;">0</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="data-card">
                     <div class="data-card-header">
                         <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
@@ -1179,6 +1230,19 @@
                                 <option value="won">Won</option>
                                 <option value="lost">Lost</option>
                             </select>
+                            <select class="form-select" id="filterLeadPriority" style="width:auto; padding:8px 14px; background:rgba(255,255,255,0.04); color:var(--text-primary); border:1px solid var(--border-glass); border-radius:10px; font-size:0.85rem;">
+                                <option value="all">All Priorities</option>
+                                <option value="Urgent">Urgent</option>
+                                <option value="High">High</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Low">Low</option>
+                            </select>
+                            <select class="form-select" id="filterLeadFollowUp" style="width:auto; padding:8px 14px; background:rgba(255,255,255,0.04); color:var(--text-primary); border:1px solid var(--border-glass); border-radius:10px; font-size:0.85rem;">
+                                <option value="all">All Follow-ups</option>
+                                <option value="overdue">Overdue</option>
+                                <option value="today">Due Today</option>
+                                <option value="upcoming">Upcoming</option>
+                            </select>
                         </div>
                         <div style="display: flex; gap: 8px;">
                             <button class="btn btn-secondary btn-sm" id="exportLeadsCsv">Export CSV</button>
@@ -1190,12 +1254,12 @@
                             <thead>
                                 <tr>
                                     <th>Created Date</th>
-                                    <th>Name</th>
+                                    <th>Client / Name</th>
                                     <th>Company</th>
-                                    <th>Country</th>
-                                    <th>Project Type</th>
-                                    <th>Budget</th>
+                                    <th>Project</th>
+                                    <th>Priority</th>
                                     <th>Status</th>
+                                    <th>Next Follow-up</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -2303,9 +2367,9 @@
 
     <!-- LEAD DETAILS MODAL -->
     <div class="premium-modal" id="leadModal">
-        <div class="premium-modal-content" style="max-width: 500px;">
+        <div class="premium-modal-content" style="max-width: 680px; width: 92%; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
-                <h3 class="modal-title">Form Submission Details</h3>
+                <h3 class="modal-title">Lead &amp; CRM Details</h3>
                 <button class="modal-close" id="closeLeadModal">✕</button>
             </div>
             <div id="leadModalBody"></div>
@@ -3103,45 +3167,153 @@
             });
         };
 
-        // LEADS TABLE WITH SUPABASE SERVER-SIDE PAGINATION & FILTERING
+        // LEADS CRM TABLE WITH SUPABASE SERVER-SIDE PAGINATION, FILTERING & METRICS
         let leadsCurrentPage = 1;
         const leadsPageLimit = 25;
         let leadsTotalPages = 1;
         let leadsTotalCount = 0;
 
-        window.updateLeadStatus = async (leadId, newStatus) => {
+        const updateCrmKpiCards = (summary) => {
+            let s = summary;
+            if (!s) {
+                // Calculate from local database.submissions
+                const leads = database.submissions || [];
+                const todayIso = new Date().toISOString().slice(0, 10);
+                const stages = { New: 0, Contacted: 0, Qualified: 0, Proposal: 0, Won: 0, Lost: 0 };
+                const priorities = { Urgent: 0, High: 0, Normal: 0, Low: 0 };
+                let dueToday = 0, overdue = 0, upcoming = 0, totalScheduled = 0;
+
+                leads.forEach(l => {
+                    const st = (l.status || 'New').toLowerCase();
+                    const capSt = st.charAt(0).toUpperCase() + st.slice(1);
+                    if (stages[capSt] !== undefined) stages[capSt]++;
+                    const pr = l.priority || 'Normal';
+                    if (priorities[pr] !== undefined) priorities[pr]++;
+                    if (l.next_follow_up) {
+                        totalScheduled++;
+                        const isResolved = ['won', 'lost'].includes(st);
+                        if (!isResolved) {
+                            if (l.next_follow_up === todayIso) dueToday++;
+                            else if (l.next_follow_up < todayIso) overdue++;
+                            else upcoming++;
+                        }
+                    }
+                });
+                s = {
+                    total: leads.length,
+                    stages,
+                    priorities,
+                    followUps: { dueToday, overdue, upcoming, totalScheduled }
+                };
+            }
+
+            const setEl = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val !== undefined && val !== null ? val : 0;
+            };
+
+            setEl('crmCountAll', s.total || 0);
+            setEl('crmCountNew', s.stages?.New || 0);
+            setEl('crmCountContacted', s.stages?.Contacted || 0);
+            setEl('crmCountQualified', s.stages?.Qualified || 0);
+            setEl('crmCountProposal', s.stages?.Proposal || 0);
+            setEl('crmCountWon', s.stages?.Won || 0);
+            setEl('crmCountLost', s.stages?.Lost || 0);
+
+            setEl('crmCountOverdue', s.followUps?.overdue || 0);
+            setEl('crmCountToday', s.followUps?.dueToday || 0);
+            setEl('crmCountUpcoming', s.followUps?.upcoming || 0);
+        };
+
+        window.updateLeadCrm = async (leadId, crmUpdates = {}) => {
             const sub = database.submissions.find(s => s.id === leadId);
             if (sub) {
-                sub.status = newStatus;
+                Object.assign(sub, crmUpdates);
                 sub.updatedAt = new Date().toISOString();
             }
 
             try {
                 const token = getAdminAuthToken();
+                if (!token) throw new Error('NO_TOKEN');
                 const res = await fetch('/api/admin/leads', {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ id: leadId, status: newStatus })
+                    body: JSON.stringify({ id: leadId, ...crmUpdates })
                 });
 
+                const data = await res.json().catch(() => ({}));
                 if (res.ok) {
-                    showToast(`Lead status updated to: ${newStatus.toUpperCase()}`, 'success');
+                    showToast('Lead CRM updated successfully.', 'success');
+                    if (data && data.lead) {
+                        const idx = database.submissions.findIndex(s => s.id === leadId);
+                        if (idx > -1) {
+                            database.submissions[idx] = { ...database.submissions[idx], ...data.lead };
+                        }
+                    }
+                    saveData();
+                    renderLeadsTable();
+                    return data.lead || true;
                 } else {
-                    const err = await res.json().catch(() => ({}));
-                    showToast(err.message || 'Status update failed.', 'warning');
+                    showToast(data.message || 'CRM update failed.', 'warning');
+                    return null;
                 }
             } catch (err) {
-                showToast(`Lead status updated locally to: ${newStatus.toUpperCase()}`, 'info');
+                saveData();
+                renderLeadsTable();
+                showToast('Lead updated locally.', 'info');
+                return true;
             }
-
-            saveData();
-            renderLeadsTable(document.getElementById('searchLeads')?.value || '', document.getElementById('filterLeadStatus')?.value || 'all', leadsCurrentPage);
         };
 
-        const renderLeadsTable = async (searchQuery = '', statusFilter = 'all', page = 1) => {
+        window.updateLeadStatus = async (leadId, newStatus) => {
+            return await window.updateLeadCrm(leadId, { status: newStatus });
+        };
+
+        window.quickMarkContacted = async (leadId) => {
+            return await window.updateLeadCrm(leadId, {
+                status: 'contacted',
+                last_contacted_at: new Date().toISOString()
+            });
+        };
+
+        const getPriorityBadgeHtml = (priority) => {
+            const p = priority || 'Normal';
+            let bg = 'rgba(56,189,248,0.15)', text = '#38bdf8', border = 'rgba(56,189,248,0.3)', icon = 'fa-minus';
+            if (p === 'Urgent') {
+                bg = 'rgba(239,68,68,0.18)'; text = '#ef4444'; border = 'rgba(239,68,68,0.4)'; icon = 'fa-bolt';
+            } else if (p === 'High') {
+                bg = 'rgba(249,115,22,0.18)'; text = '#f97316'; border = 'rgba(249,115,22,0.4)'; icon = 'fa-arrow-up';
+            } else if (p === 'Normal') {
+                bg = 'rgba(56,189,248,0.15)'; text = '#38bdf8'; border = 'rgba(56,189,248,0.3)'; icon = 'fa-minus';
+            } else if (p === 'Low') {
+                bg = 'rgba(148,163,184,0.15)'; text = '#94a3b8'; border = 'rgba(148,163,184,0.3)'; icon = 'fa-arrow-down';
+            }
+            return `<span style="display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; background:${bg}; color:${text}; border:1px solid ${border};"><i class="fa-solid ${icon}" style="font-size:0.68rem;"></i> ${escapeHTML(p)}</span>`;
+        };
+
+        const getFollowUpBadgeHtml = (followUpDate, status) => {
+            if (!followUpDate) return '<span style="color:var(--text-muted); font-size:0.8rem;">—</span>';
+            const today = new Date().toISOString().slice(0, 10);
+            const isResolved = ['won', 'lost'].includes((status || '').toLowerCase());
+            if (!isResolved && followUpDate < today) {
+                return `<span style="display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; background:rgba(239,68,68,0.18); color:#ef4444; border:1px solid rgba(239,68,68,0.35);" title="Follow-up overdue!"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHTML(followUpDate)} <span style="font-size:0.68rem; opacity:0.85;">(Overdue)</span></span>`;
+            }
+            if (!isResolved && followUpDate === today) {
+                return `<span style="display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; background:rgba(245,158,11,0.18); color:#f59e0b; border:1px solid rgba(245,158,11,0.35);" title="Due today!"><i class="fa-solid fa-calendar-day"></i> Today (${escapeHTML(followUpDate)})</span>`;
+            }
+            return `<span style="display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px; font-size:0.75rem; color:var(--text-secondary); background:rgba(255,255,255,0.04); border:1px solid var(--border-glass);"><i class="fa-regular fa-calendar"></i> ${escapeHTML(followUpDate)}</span>`;
+        };
+
+        const renderLeadsTable = async (
+            searchQuery = document.getElementById('searchLeads')?.value || '',
+            statusFilter = document.getElementById('filterLeadStatus')?.value || 'all',
+            priorityFilter = document.getElementById('filterLeadPriority')?.value || 'all',
+            followUpFilter = document.getElementById('filterLeadFollowUp')?.value || 'all',
+            page = leadsCurrentPage
+        ) => {
             const tbody = document.getElementById('leadsTableBody');
             if (!tbody) return;
             leadsCurrentPage = Math.max(Number(page) || 1, 1);
@@ -3151,7 +3323,7 @@
             try {
                 const token = getAdminAuthToken();
                 if (!token) throw new Error('NO_TOKEN');
-                const endpoint = `/api/admin/leads?page=${leadsCurrentPage}&limit=${leadsPageLimit}&status=${encodeURIComponent(statusFilter)}&search=${encodeURIComponent(searchQuery)}`;
+                const endpoint = `/api/admin/leads?page=${leadsCurrentPage}&limit=${leadsPageLimit}&status=${encodeURIComponent(statusFilter)}&priority=${encodeURIComponent(priorityFilter)}&followUp=${encodeURIComponent(followUpFilter)}&search=${encodeURIComponent(searchQuery)}`;
                 const res = await fetch(endpoint, {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -3171,6 +3343,10 @@
                         leadsTotalPages = data.totalPages || 1;
                         leadsCurrentPage = data.page || 1;
                         fetchedFromServer = true;
+
+                        if (data.summary) {
+                            updateCrmKpiCards(data.summary);
+                        }
                     }
                 }
             } catch (apiErr) {
@@ -3187,6 +3363,23 @@
                     filtered = filtered.filter(l => (l.status || 'new').toLowerCase() === statusFilter.toLowerCase());
                 }
 
+                if (priorityFilter && priorityFilter !== 'all') {
+                    filtered = filtered.filter(l => (l.priority || 'Normal').toLowerCase() === priorityFilter.toLowerCase());
+                }
+
+                if (followUpFilter && followUpFilter !== 'all') {
+                    const todayIso = new Date().toISOString().slice(0, 10);
+                    filtered = filtered.filter(l => {
+                        if (!l.next_follow_up) return false;
+                        const isResolved = ['won', 'lost'].includes((l.status || '').toLowerCase());
+                        if (isResolved) return false;
+                        if (followUpFilter === 'today') return l.next_follow_up === todayIso;
+                        if (followUpFilter === 'overdue') return l.next_follow_up < todayIso;
+                        if (followUpFilter === 'upcoming') return l.next_follow_up > todayIso;
+                        return true;
+                    });
+                }
+
                 if (searchQuery) {
                     const q = searchQuery.toLowerCase();
                     filtered = filtered.filter(l => 
@@ -3195,7 +3388,8 @@
                         (l.company || '').toLowerCase().includes(q) ||
                         (l.country || '').toLowerCase().includes(q) ||
                         (l.projectType || l.type || '').toLowerCase().includes(q) ||
-                        (l.description || l.message || '').toLowerCase().includes(q)
+                        (l.description || l.message || '').toLowerCase().includes(q) ||
+                        (l.internal_notes || '').toLowerCase().includes(q)
                     );
                 }
 
@@ -3203,6 +3397,8 @@
                 leadsTotalPages = Math.max(Math.ceil(leadsTotalCount / leadsPageLimit), 1);
                 const startIndex = (leadsCurrentPage - 1) * leadsPageLimit;
                 displayLeads = filtered.slice(startIndex, startIndex + leadsPageLimit);
+
+                updateCrmKpiCards();
             }
 
             // Update Pagination UI
@@ -3220,7 +3416,7 @@
             tbody.innerHTML = '';
 
             if (displayLeads.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding:28px;">No leads found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding:32px;">No leads found matching current criteria.</td></tr>';
                 return;
             }
 
@@ -3235,76 +3431,118 @@
                 return '#94a3b8';
             };
 
-            displayLeads.forEach(sub => {
-                const tr = document.createElement('tr');
-                const date = new Date(sub.createdAt || sub.timestamp).toLocaleDateString();
-                const curStatus = (sub.status || 'new').toLowerCase();
-
-                tr.innerHTML = `
-                    <td style="white-space:nowrap; font-size:0.82rem; color:var(--text-secondary);">${escapeHTML(date)}</td>
-                    <td style="font-weight:600; color:var(--text-primary);">${escapeHTML(sub.name || 'Anonymous')}</td>
-                    <td style="color:var(--text-secondary);">${escapeHTML(sub.company || '—')}</td>
-                    <td style="color:var(--text-secondary);">${escapeHTML(sub.country || '—')}</td>
-                    <td><span class="tag tag-blue" style="font-size:0.75rem;">${escapeHTML(sub.projectType || sub.type || 'General')}</span></td>
-                    <td style="font-weight:600; color:var(--text-primary); font-size:0.85rem;">${escapeHTML(sub.budget || '—')}</td>
-                    <td>
-                        <select onchange="window.updateLeadStatus('${escapeHTML(sub.id)}', this.value)" style="padding:4px 8px; font-size:0.78rem; font-weight:600; border-radius:6px; background:rgba(255,255,255,0.05); color:${getStatusBadgeColor(curStatus)}; border:1px solid ${getStatusBadgeColor(curStatus)}50; cursor:pointer;">
-                            <option value="new" ${curStatus === 'new' ? 'selected' : ''}>New</option>
-                            <option value="contacted" ${curStatus === 'contacted' ? 'selected' : ''}>Contacted</option>
-                            <option value="qualified" ${curStatus === 'qualified' ? 'selected' : ''}>Qualified</option>
-                            <option value="proposal" ${curStatus === 'proposal' ? 'selected' : ''}>Proposal</option>
-                            <option value="won" ${curStatus === 'won' ? 'selected' : ''}>Won</option>
-                            <option value="lost" ${curStatus === 'lost' ? 'selected' : ''}>Lost</option>
-                        </select>
-                    </td>
-                    <td>
-                        <div class="action-btns">
-                            <button type="button" class="action-btn action-btn-view action-btn-icon" title="View Lead Details" onclick="viewLeadDetails('${escapeHTML(sub.id)}')">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-                            <button type="button" class="action-btn action-btn-edit action-btn-icon" title="Edit Lead" onclick="editLeadDetails('${escapeHTML(sub.id)}')">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button type="button" class="action-btn action-btn-delete action-btn-icon" title="Delete Lead" onclick="confirmDeleteLead('${escapeHTML(sub.id)}')">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        };
-
         // Wire pagination buttons
         document.getElementById('leadsPrevPageBtn')?.addEventListener('click', () => {
             if (leadsCurrentPage > 1) {
-                renderLeadsTable(document.getElementById('searchLeads')?.value || '', document.getElementById('filterLeadStatus')?.value || 'all', leadsCurrentPage - 1);
+                renderLeadsTable(
+                    document.getElementById('searchLeads')?.value || '',
+                    document.getElementById('filterLeadStatus')?.value || 'all',
+                    document.getElementById('filterLeadPriority')?.value || 'all',
+                    document.getElementById('filterLeadFollowUp')?.value || 'all',
+                    leadsCurrentPage - 1
+                );
             }
         });
 
         document.getElementById('leadsNextPageBtn')?.addEventListener('click', () => {
             if (leadsCurrentPage < leadsTotalPages) {
-                renderLeadsTable(document.getElementById('searchLeads')?.value || '', document.getElementById('filterLeadStatus')?.value || 'all', leadsCurrentPage + 1);
+                renderLeadsTable(
+                    document.getElementById('searchLeads')?.value || '',
+                    document.getElementById('filterLeadStatus')?.value || 'all',
+                    document.getElementById('filterLeadPriority')?.value || 'all',
+                    document.getElementById('filterLeadFollowUp')?.value || 'all',
+                    leadsCurrentPage + 1
+                );
             }
         });
 
-        document.getElementById('searchLeads')?.addEventListener('input', (e) => {
-            renderLeadsTable(e.target.value, document.getElementById('filterLeadStatus')?.value || 'all', 1);
+        // Filter event listeners
+        document.getElementById('searchLeads')?.addEventListener('input', () => {
+            renderLeadsTable(
+                document.getElementById('searchLeads')?.value || '',
+                document.getElementById('filterLeadStatus')?.value || 'all',
+                document.getElementById('filterLeadPriority')?.value || 'all',
+                document.getElementById('filterLeadFollowUp')?.value || 'all',
+                1
+            );
         });
 
-        document.getElementById('filterLeadStatus')?.addEventListener('change', (e) => {
-            renderLeadsTable(document.getElementById('searchLeads')?.value || '', e.target.value, 1);
+        document.getElementById('filterLeadStatus')?.addEventListener('change', () => {
+            renderLeadsTable(
+                document.getElementById('searchLeads')?.value || '',
+                document.getElementById('filterLeadStatus')?.value || 'all',
+                document.getElementById('filterLeadPriority')?.value || 'all',
+                document.getElementById('filterLeadFollowUp')?.value || 'all',
+                1
+            );
         });
 
-        // Leads Export CSV (Supabase backend with fallback)
+        document.getElementById('filterLeadPriority')?.addEventListener('change', () => {
+            renderLeadsTable(
+                document.getElementById('searchLeads')?.value || '',
+                document.getElementById('filterLeadStatus')?.value || 'all',
+                document.getElementById('filterLeadPriority')?.value || 'all',
+                document.getElementById('filterLeadFollowUp')?.value || 'all',
+                1
+            );
+        });
+
+        document.getElementById('filterLeadFollowUp')?.addEventListener('change', () => {
+            renderLeadsTable(
+                document.getElementById('searchLeads')?.value || '',
+                document.getElementById('filterLeadStatus')?.value || 'all',
+                document.getElementById('filterLeadPriority')?.value || 'all',
+                document.getElementById('filterLeadFollowUp')?.value || 'all',
+                1
+            );
+        });
+
+        // Stage Cards and Alert Pills Quick Click Handlers
+        document.querySelectorAll('.crm-stage-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const stage = card.getAttribute('data-stage') || 'all';
+                const statusSelect = document.getElementById('filterLeadStatus');
+                if (statusSelect) {
+                    statusSelect.value = stage;
+                }
+                renderLeadsTable(
+                    document.getElementById('searchLeads')?.value || '',
+                    stage,
+                    document.getElementById('filterLeadPriority')?.value || 'all',
+                    document.getElementById('filterLeadFollowUp')?.value || 'all',
+                    1
+                );
+            });
+        });
+
+        document.querySelectorAll('.crm-alert-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                const fu = pill.getAttribute('data-followup') || 'all';
+                const fuSelect = document.getElementById('filterLeadFollowUp');
+                if (fuSelect) {
+                    fuSelect.value = fu;
+                }
+                renderLeadsTable(
+                    document.getElementById('searchLeads')?.value || '',
+                    document.getElementById('filterLeadStatus')?.value || 'all',
+                    document.getElementById('filterLeadPriority')?.value || 'all',
+                    fu,
+                    1
+                );
+            });
+        });
+
+        // Leads Export CSV (Supabase backend with CRM fields & fallback)
         document.getElementById('exportLeadsCsv')?.addEventListener('click', async () => {
             const token = getAdminAuthToken();
             const status = document.getElementById('filterLeadStatus')?.value || 'all';
+            const priority = document.getElementById('filterLeadPriority')?.value || 'all';
+            const followUp = document.getElementById('filterLeadFollowUp')?.value || 'all';
             const search = document.getElementById('searchLeads')?.value || '';
 
             if (token) {
                 try {
-                    const res = await fetch(`/api/admin/leads?export=csv&status=${encodeURIComponent(status)}&search=${encodeURIComponent(search)}`, {
+                    const res = await fetch(`/api/admin/leads?export=csv&status=${encodeURIComponent(status)}&priority=${encodeURIComponent(priority)}&followUp=${encodeURIComponent(followUp)}&search=${encodeURIComponent(search)}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (res.ok) {
@@ -3312,12 +3550,12 @@
                         const url = URL.createObjectURL(blob);
                         const link = document.createElement('a');
                         link.setAttribute('href', url);
-                        link.setAttribute('download', `shaivika_leads_${new Date().toISOString().slice(0,10)}.csv`);
+                        link.setAttribute('download', `shaivika_leads_crm_${new Date().toISOString().slice(0,10)}.csv`);
                         document.body.appendChild(link);
                         link.click();
                         link.remove();
                         URL.revokeObjectURL(url);
-                        showToast('Leads CSV exported from Supabase database.', 'success');
+                        showToast('Leads CRM CSV exported from Supabase database.', 'success');
                         return;
                     }
                 } catch (err) {
@@ -3330,7 +3568,7 @@
                 showToast('No leads available to export.', 'error');
                 return;
             }
-            const headers = ['ID', 'Date', 'Name', 'Email', 'Company', 'Country', 'Phone', 'Contact Method', 'Project Type', 'Budget', 'Launch Date', 'Status', 'Description'];
+            const headers = ['ID', 'Date', 'Name', 'Email', 'Company', 'Country', 'Phone', 'Contact Method', 'Project Type', 'Budget', 'Priority', 'Status', 'Next Follow-up', 'Last Contacted', 'Internal Notes', 'Description'];
             const rows = database.submissions.map(s => [
                 s.id || '',
                 s.createdAt || s.timestamp || '',
@@ -3342,46 +3580,52 @@
                 `"${(s.contactMethod || '').replace(/"/g, '""')}"`,
                 `"${(s.projectType || s.type || '').replace(/"/g, '""')}"`,
                 `"${(s.budget || '').replace(/"/g, '""')}"`,
-                `"${(s.launchDate || '').replace(/"/g, '""')}"`,
+                `"${(s.priority || 'Normal').replace(/"/g, '""')}"`,
                 `"${(s.status || 'new').replace(/"/g, '""')}"`,
+                `"${(s.next_follow_up || '').replace(/"/g, '""')}"`,
+                `"${(s.last_contacted_at || '').replace(/"/g, '""')}"`,
+                `"${(s.internal_notes || '').replace(/"/g, '""')}"`,
                 `"${(s.description || s.message || '').replace(/"/g, '""')}"`
             ]);
             const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement('a');
             link.setAttribute('href', encodedUri);
-            link.setAttribute('download', `shaivika_leads_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute('download', `shaivika_leads_crm_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             link.remove();
-            showToast('Leads CSV exported successfully.', 'success');
+            showToast('Leads CRM CSV exported successfully.', 'success');
         });
 
         // Leads Export JSON (Supabase backend with fallback)
         document.getElementById('exportLeadsJson')?.addEventListener('click', async () => {
             const token = getAdminAuthToken();
             const status = document.getElementById('filterLeadStatus')?.value || 'all';
+            const priority = document.getElementById('filterLeadPriority')?.value || 'all';
+            const followUp = document.getElementById('filterLeadFollowUp')?.value || 'all';
             const search = document.getElementById('searchLeads')?.value || '';
 
             if (token) {
                 try {
-                    const res = await fetch(`/api/admin/leads?export=json&status=${encodeURIComponent(status)}&search=${encodeURIComponent(search)}`, {
+                    const res = await fetch(`/api/admin/leads?export=json&status=${encodeURIComponent(status)}&priority=${encodeURIComponent(priority)}&followUp=${encodeURIComponent(followUp)}&search=${encodeURIComponent(search)}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (res.ok) {
                         const data = await res.json();
                         const jsonStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data.leads || [], null, 2));
-                    const link = document.createElement('a');
-                    link.setAttribute('href', jsonStr);
-                    link.setAttribute('download', `shaivika_leads_${new Date().toISOString().slice(0,10)}.json`);
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
-                    showToast('Leads JSON exported from Supabase database.', 'success');
-                    return;
+                        const link = document.createElement('a');
+                        link.setAttribute('href', jsonStr);
+                        link.setAttribute('download', `shaivika_leads_crm_${new Date().toISOString().slice(0,10)}.json`);
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                        showToast('Leads CRM JSON exported from Supabase database.', 'success');
+                        return;
+                    }
+                } catch (err) {
+                    console.warn('Direct JSON export fallback:', err);
                 }
-            } catch (err) {
-                console.warn('Direct JSON export fallback:', err);
             }
 
             // Fallback JSON export
@@ -3392,11 +3636,11 @@
             const jsonStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(database.submissions, null, 2));
             const link = document.createElement('a');
             link.setAttribute('href', jsonStr);
-            link.setAttribute('download', `shaivika_leads_${new Date().toISOString().slice(0,10)}.json`);
+            link.setAttribute('download', `shaivika_leads_crm_${new Date().toISOString().slice(0,10)}.json`);
             document.body.appendChild(link);
             link.click();
             link.remove();
-            showToast('Leads JSON exported successfully.', 'success');
+            showToast('Leads CRM JSON exported successfully.', 'success');
         });
 
         // JOBS MANAGEMENT TABLE
@@ -4667,10 +4911,16 @@
                 return '#94a3b8';
             };
             const phoneVal = sub.phone ? `<a href="https://wa.me/${escapeHTML(sub.phone.replace(/[^0-9]/g, ''))}" target="_blank" style="color:#10b981; font-weight:600;">${escapeHTML(sub.phone)} ↗</a>` : '<span style="color:var(--text-muted);">Not Provided</span>';
+            const curStatus = (sub.status || 'new').toLowerCase();
+            const curPriority = sub.priority || 'Normal';
+            const curFollowUp = sub.next_follow_up || '';
+            const curNotes = sub.internal_notes || '';
+            const curLastContacted = sub.last_contacted_at ? new Date(sub.last_contacted_at).toLocaleString() : 'Never Contacted';
 
             document.getElementById('leadModalBody').innerHTML = `
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:18px;">
-                    <div class="lead-detail-field"><div class="lead-detail-label">Full Name</div><div class="lead-detail-value" style="font-weight:700; color:var(--text-primary); font-size:1.05rem;">${escapeHTML(sub.name || 'Anonymous')}</div></div>
+                <!-- Lead Submission Info (Read-Only) -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
+                    <div class="lead-detail-field"><div class="lead-detail-label">Full Name</div><div class="lead-detail-value" style="font-weight:700; color:var(--text-primary); font-size:1.02rem;">${escapeHTML(sub.name || 'Anonymous')}</div></div>
                     <div class="lead-detail-field"><div class="lead-detail-label">Work Email</div><div class="lead-detail-value"><a href="mailto:${escapeHTML(sub.email)}" style="color:var(--accent); font-weight:600;">${escapeHTML(sub.email)}</a></div></div>
                     <div class="lead-detail-field"><div class="lead-detail-label">Company</div><div class="lead-detail-value">${escapeHTML(sub.company || 'Not Specified')}</div></div>
                     <div class="lead-detail-field"><div class="lead-detail-label">Country</div><div class="lead-detail-value">${escapeHTML(sub.country || 'Not Specified')}</div></div>
@@ -4679,15 +4929,114 @@
                     <div class="lead-detail-field"><div class="lead-detail-label">Project Type</div><div class="lead-detail-value"><span class="tag tag-cyan">${escapeHTML(sub.projectType || sub.type || 'General')}</span></div></div>
                     <div class="lead-detail-field"><div class="lead-detail-label">Budget Range</div><div class="lead-detail-value" style="color:var(--success); font-weight:700;">${escapeHTML(sub.budget || 'TBD')}</div></div>
                     <div class="lead-detail-field"><div class="lead-detail-label">Target Launch Date</div><div class="lead-detail-value">${escapeHTML(sub.launchDate || 'Flexible')}</div></div>
-                    <div class="lead-detail-field"><div class="lead-detail-label">Current Status</div><div class="lead-detail-value"><span style="display:inline-block; padding:3px 10px; border-radius:6px; font-size:0.8rem; font-weight:700; color:${statusColor(sub.status)}; background:${statusColor(sub.status)}20; border:1px solid ${statusColor(sub.status)}40;">${escapeHTML((sub.status || 'New').toUpperCase())}</span></div></div>
                     <div class="lead-detail-field"><div class="lead-detail-label">Submitted At</div><div class="lead-detail-value" style="font-size:0.85rem; color:var(--text-secondary);">${new Date(sub.createdAt || sub.timestamp).toLocaleString()}</div></div>
                     <div class="lead-detail-field"><div class="lead-detail-label">Lead Source</div><div class="lead-detail-value"><code style="font-size:0.78rem; color:var(--cyan);">${escapeHTML(sub.source || 'website-contact-form')}</code></div></div>
                 </div>
-                <div class="lead-detail-field">
+
+                <div class="lead-detail-field" style="margin-bottom:18px;">
                     <div class="lead-detail-label">Project Description</div>
-                    <div class="lead-detail-value" style="white-space:pre-wrap; background:rgba(0,0,0,0.25); padding:16px; border-radius:10px; border:1px solid var(--border-glass); line-height:1.65; color:var(--text-primary); font-size:0.92rem;">${escapeHTML(sub.description || sub.message || 'No description provided.')}</div>
+                    <div class="lead-detail-value" style="white-space:pre-wrap; background:rgba(0,0,0,0.25); padding:14px; border-radius:10px; border:1px solid var(--border-glass); line-height:1.6; color:var(--text-primary); font-size:0.88rem;">${escapeHTML(sub.description || sub.message || 'No description provided.')}</div>
+                </div>
+
+                <!-- CRM Management Center (Interactive) -->
+                <div style="background:rgba(15,23,42,0.65); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:16px; margin-top:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                        <h4 style="margin:0; font-size:0.92rem; font-weight:700; color:#38bdf8; display:flex; align-items:center; gap:6px;">
+                            <i class="fa-solid fa-sliders"></i> CRM Pipeline &amp; Action Center
+                        </h4>
+                        <button type="button" id="crmMarkContactedNowBtn" style="background:rgba(245,158,11,0.18); color:#f59e0b; border:1px solid rgba(245,158,11,0.4); font-size:0.78rem; font-weight:600; padding:4px 10px; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                            <i class="fa-solid fa-phone"></i> Mark Contacted Now
+                        </button>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; margin-bottom:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.72rem; color:var(--text-secondary); margin-bottom:4px; font-weight:700; text-transform:uppercase;">Status</label>
+                            <select id="crmEditStatus" style="width:100%; padding:8px; border-radius:8px; background:rgba(255,255,255,0.06); color:var(--text-primary); border:1px solid var(--border-glass); font-size:0.85rem; font-weight:600;">
+                                <option value="new" ${curStatus === 'new' ? 'selected' : ''}>New</option>
+                                <option value="contacted" ${curStatus === 'contacted' ? 'selected' : ''}>Contacted</option>
+                                <option value="qualified" ${curStatus === 'qualified' ? 'selected' : ''}>Qualified</option>
+                                <option value="proposal" ${curStatus === 'proposal' ? 'selected' : ''}>Proposal</option>
+                                <option value="won" ${curStatus === 'won' ? 'selected' : ''}>Won</option>
+                                <option value="lost" ${curStatus === 'lost' ? 'selected' : ''}>Lost</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.72rem; color:var(--text-secondary); margin-bottom:4px; font-weight:700; text-transform:uppercase;">Priority</label>
+                            <select id="crmEditPriority" style="width:100%; padding:8px; border-radius:8px; background:rgba(255,255,255,0.06); color:var(--text-primary); border:1px solid var(--border-glass); font-size:0.85rem; font-weight:600;">
+                                <option value="Low" ${curPriority === 'Low' ? 'selected' : ''}>Low</option>
+                                <option value="Normal" ${curPriority === 'Normal' ? 'selected' : ''}>Normal</option>
+                                <option value="High" ${curPriority === 'High' ? 'selected' : ''}>High</option>
+                                <option value="Urgent" ${curPriority === 'Urgent' ? 'selected' : ''}>Urgent</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.72rem; color:var(--text-secondary); margin-bottom:4px; font-weight:700; text-transform:uppercase;">Next Follow-up</label>
+                            <input type="date" id="crmEditFollowUp" value="${escapeHTML(curFollowUp)}" style="width:100%; padding:7px 8px; border-radius:8px; background:rgba(255,255,255,0.06); color:var(--text-primary); border:1px solid var(--border-glass); font-size:0.85rem;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.72rem; color:var(--text-secondary); margin-bottom:4px; font-weight:700; text-transform:uppercase;">Last Contacted</label>
+                            <div id="crmLastContactedDisplay" style="font-size:0.78rem; color:var(--text-secondary); padding:8px; background:rgba(255,255,255,0.03); border:1px solid var(--border-glass); border-radius:8px; min-height:36px; display:flex; align-items:center;">
+                                ${escapeHTML(curLastContacted)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-size:0.72rem; color:var(--text-secondary); margin-bottom:4px; font-weight:700; text-transform:uppercase;">Internal CRM Notes</label>
+                        <textarea id="crmEditNotes" rows="3" placeholder="Enter private sales notes, call updates, lead objections, next action..." style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.06); color:var(--text-primary); border:1px solid var(--border-glass); font-size:0.86rem; line-height:1.5; resize:vertical;">${escapeHTML(curNotes)}</textarea>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end;">
+                        <button type="button" class="btn btn-primary btn-sm" id="crmSaveLeadBtn" style="padding:8px 18px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+                            <i class="fa-solid fa-floppy-disk"></i> Save CRM Changes
+                        </button>
+                    </div>
                 </div>
             `;
+
+            // Wire Quick Mark Contacted
+            document.getElementById('crmMarkContactedNowBtn')?.addEventListener('click', async () => {
+                const nowIso = new Date().toISOString();
+                const res = await window.updateLeadCrm(sub.id, {
+                    status: 'contacted',
+                    last_contacted_at: nowIso
+                });
+                if (res) {
+                    const statusSelect = document.getElementById('crmEditStatus');
+                    if (statusSelect) statusSelect.value = 'contacted';
+                    const lastContactEl = document.getElementById('crmLastContactedDisplay');
+                    if (lastContactEl) lastContactEl.textContent = new Date(nowIso).toLocaleString();
+                }
+            });
+
+            // Wire Save CRM Changes
+            document.getElementById('crmSaveLeadBtn')?.addEventListener('click', async () => {
+                const statusVal = document.getElementById('crmEditStatus')?.value;
+                const priorityVal = document.getElementById('crmEditPriority')?.value;
+                const followUpVal = document.getElementById('crmEditFollowUp')?.value;
+                const notesVal = document.getElementById('crmEditNotes')?.value;
+
+                const saveBtn = document.getElementById('crmSaveLeadBtn');
+                const origText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+                saveBtn.disabled = true;
+
+                const res = await window.updateLeadCrm(sub.id, {
+                    status: statusVal,
+                    priority: priorityVal,
+                    next_follow_up: followUpVal || null,
+                    internal_notes: notesVal
+                });
+
+                saveBtn.innerHTML = origText;
+                saveBtn.disabled = false;
+
+                if (res) {
+                    showToast('CRM details saved successfully.', 'success');
+                }
+            });
+
             leadModal.classList.add('open');
             document.body.style.overflow = 'hidden';
         };
@@ -4726,14 +5075,7 @@
         // Edit Panel Logic
         const editLeadPanel = document.getElementById('editLeadPanel');
         window.editLeadDetails = (id) => {
-            const sub = database.submissions.find(s => s.id === id);
-            if (!sub) return;
-            document.getElementById('editLeadId').value = sub.id;
-            document.getElementById('editLeadName').value = sub.name;
-            document.getElementById('editLeadEmail').value = sub.email;
-            document.getElementById('editLeadSubject').value = sub.subject || '';
-            document.getElementById('editLeadMessage').value = sub.message || '';
-            editLeadPanel.classList.add('open');
+            window.viewLeadDetails(id);
         };
 
         document.getElementById('closeEditPanelBtn').addEventListener('click', () => {

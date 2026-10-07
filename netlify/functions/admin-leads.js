@@ -1,23 +1,28 @@
 /**
- * SHAIVIKA IT TECHNOLOGIES — SECURE ADMIN LEADS API
- * GET /api/admin/leads  — Paginated leads list with search & status filter
- * GET /api/admin/leads?export=csv|json — Export leads (safe fields only)
- * PATCH /api/admin/leads — Update lead status
+ * SHAIVIKA IT TECHNOLOGIES — SECURE ADMIN LEADS & CRM API
+ * GET /api/admin/leads  — Paginated leads with search, status, priority, and follow-up filters
+ * GET /api/admin/leads?export=csv|json — Export leads (with CRM fields)
+ * PATCH /api/admin/leads — Update lead CRM fields (status, priority, notes, follow-up, last contacted)
  *
  * Security:
- * - Admin authorization check (Bearer token / x-admin-key)
+ * - Admin authorization check (Pure Supabase Auth JWT)
  * - Service-role key stays strictly server-side
- * - No sensitive internals exposed
- * - Strict HTTP method handling (405 for disallowed methods)
+ * - Strict 401 (unauthenticated) and 403 (unauthorized non-admin) enforcement
+ * - Zero ADMIN_KEY / x-admin-key acceptance
  */
 
-const { isSupabaseConfigured, getLeads, updateLeadStatus } = require('./utils/supabase');
+const {
+  isSupabaseConfigured,
+  getLeads,
+  getCrmMetrics,
+  updateLeadCrm,
+  VALID_STATUSES,
+  VALID_PRIORITIES
+} = require('./utils/supabase');
 const { verifyAdminRequest } = require('./utils/auth');
 
-const VALID_STATUSES = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];
-
 /**
- * Sanitize lead record for admin display & export (strip internal fields like ip_hash)
+ * Sanitize lead record for admin display & export (strip internal security fields like ip_hash)
  */
 function sanitizeLeadForExport(lead) {
   return {
@@ -33,6 +38,10 @@ function sanitizeLeadForExport(lead) {
     budget: lead.budget || '',
     launch_date: lead.launch_date || '',
     status: lead.status || 'New',
+    priority: lead.priority || 'Normal',
+    internal_notes: lead.internal_notes || '',
+    next_follow_up: lead.next_follow_up || '',
+    last_contacted_at: lead.last_contacted_at || '',
     description: lead.description || '',
     source: lead.source || 'website'
   };
@@ -42,7 +51,11 @@ function sanitizeLeadForExport(lead) {
  * Convert leads array to CSV format
  */
 function convertLeadsToCsv(leads) {
-  const headers = ['ID', 'Date', 'Name', 'Email', 'Company', 'Country', 'Phone', 'Contact Method', 'Project Type', 'Budget', 'Launch Date', 'Status', 'Description'];
+  const headers = [
+    'ID', 'Date', 'Name', 'Email', 'Company', 'Country', 'Phone',
+    'Contact Method', 'Project Type', 'Budget', 'Launch Date', 'Status',
+    'Priority', 'Next Follow-up', 'Last Contacted', 'Internal Notes', 'Description'
+  ];
   const rows = leads.map(l => [
     l.id || '',
     l.created_at || '',
@@ -56,6 +69,10 @@ function convertLeadsToCsv(leads) {
     `"${(l.budget || '').replace(/"/g, '""')}"`,
     `"${(l.launch_date || '').replace(/"/g, '""')}"`,
     `"${(l.status || 'New').replace(/"/g, '""')}"`,
+    `"${(l.priority || 'Normal').replace(/"/g, '""')}"`,
+    `"${(l.next_follow_up || '').replace(/"/g, '""')}"`,
+    `"${(l.last_contacted_at || '').replace(/"/g, '""')}"`,
+    `"${(l.internal_notes || '').replace(/"/g, '""')}"`,
     `"${(l.description || '').replace(/"/g, '""')}"`
   ]);
 
@@ -121,18 +138,20 @@ exports.handler = async (event, context) => {
 
   const query = event.queryStringParameters || {};
 
-  // GET: Fetch Leads or Export
+  // GET: Fetch Leads, Export, or CRM Summary
   if (event.httpMethod === 'GET') {
     try {
       const exportType = (query.export || '').toLowerCase();
       const status = query.status || 'all';
+      const priority = query.priority || 'all';
+      const followUp = query.followUp || query.follow_up || 'all';
       const search = query.search || '';
       const page = parseInt(query.page, 10) || 1;
       const limit = Math.min(Math.max(parseInt(query.limit, 10) || 25, 1), 50);
 
       // Handle Exports
       if (exportType === 'csv' || exportType === 'json') {
-        const result = await getLeads({ exportAll: true, status, search });
+        const result = await getLeads({ exportAll: true, status, priority, followUp, search });
         const safeLeads = (result.leads || []).map(sanitizeLeadForExport);
 
         if (exportType === 'csv') {
@@ -159,9 +178,13 @@ exports.handler = async (event, context) => {
         };
       }
 
-      // Handle Paginated Leads List
-      const result = await getLeads({ page, limit, status, search, exportAll: false });
-      const safeLeads = (result.leads || []).map(sanitizeLeadForExport);
+      // Handle Paginated Leads List + Dynamic CRM Metrics
+      const [leadsResult, summary] = await Promise.all([
+        getLeads({ page, limit, status, priority, followUp, search, exportAll: false }),
+        getCrmMetrics()
+      ]);
+
+      const safeLeads = (leadsResult.leads || []).map(sanitizeLeadForExport);
 
       return {
         statusCode: 200,
@@ -169,10 +192,22 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({
           success: true,
           leads: safeLeads,
-          total: result.total,
-          page: result.page,
-          limit: result.limit,
-          totalPages: result.totalPages
+          total: leadsResult.total,
+          page: leadsResult.page,
+          limit: leadsResult.limit,
+          totalPages: leadsResult.totalPages,
+          summary: summary || {
+            total: leadsResult.total,
+            new: 0,
+            contacted: 0,
+            qualified: 0,
+            proposal: 0,
+            won: 0,
+            lost: 0,
+            dueToday: 0,
+            overdue: 0,
+            upcoming: 0
+          }
         })
       };
     } catch (err) {
@@ -188,7 +223,7 @@ exports.handler = async (event, context) => {
     }
   }
 
-  // PATCH: Update Lead Status
+  // PATCH: Update Lead CRM Fields
   if (event.httpMethod === 'PATCH') {
     let body = {};
     try {
@@ -214,8 +249,6 @@ exports.handler = async (event, context) => {
       }
     }
 
-    const newStatus = (body.status || '').trim();
-
     if (!leadId) {
       return {
         statusCode: 400,
@@ -227,20 +260,113 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const matchedStatus = VALID_STATUSES.find(s => s.toLowerCase() === newStatus.toLowerCase());
-    if (!matchedStatus) {
+    // Validate safe fields only
+    const updates = {};
+
+    // 1. Status validation
+    if (body.status !== undefined) {
+      const s = String(body.status).trim();
+      const matchedStatus = VALID_STATUSES.find(v => v.toLowerCase() === s.toLowerCase());
+      if (!matchedStatus) {
+        return {
+          statusCode: 400,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            success: false,
+            message: `Invalid status. Allowed values: ${VALID_STATUSES.join(', ')}`
+          })
+        };
+      }
+      updates.status = matchedStatus;
+    }
+
+    // 2. Priority validation
+    if (body.priority !== undefined) {
+      const p = String(body.priority).trim();
+      const matchedPriority = VALID_PRIORITIES.find(v => v.toLowerCase() === p.toLowerCase());
+      if (!matchedPriority) {
+        return {
+          statusCode: 400,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            success: false,
+            message: `Invalid priority. Allowed values: ${VALID_PRIORITIES.join(', ')}`
+          })
+        };
+      }
+      updates.priority = matchedPriority;
+    }
+
+    // 3. Internal notes validation
+    if (body.internal_notes !== undefined || body.internalNotes !== undefined) {
+      const rawNotes = body.internal_notes !== undefined ? body.internal_notes : body.internalNotes;
+      if (typeof rawNotes !== 'string' && rawNotes !== null) {
+        return {
+          statusCode: 400,
+          headers: corsHeaders,
+          body: JSON.stringify({ success: false, message: 'Internal notes must be a string or null.' })
+        };
+      }
+      const notes = rawNotes ? String(rawNotes).trim() : '';
+      if (notes.length > 5000) {
+        return {
+          statusCode: 400,
+          headers: corsHeaders,
+          body: JSON.stringify({ success: false, message: 'Internal notes cannot exceed 5000 characters.' })
+        };
+      }
+      updates.internal_notes = notes;
+    }
+
+    // 4. Next follow-up validation
+    if (body.next_follow_up !== undefined || body.nextFollowUp !== undefined) {
+      const rawFollowUp = body.next_follow_up !== undefined ? body.next_follow_up : body.nextFollowUp;
+      if (rawFollowUp === null || rawFollowUp === '') {
+        updates.next_follow_up = null;
+      } else {
+        const dateStr = String(rawFollowUp).trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          return {
+            statusCode: 400,
+            headers: corsHeaders,
+            body: JSON.stringify({ success: false, message: 'Next follow-up date must be in YYYY-MM-DD format.' })
+          };
+        }
+        updates.next_follow_up = dateStr;
+      }
+    }
+
+    // 5. Last contacted update
+    if (body.last_contacted_at !== undefined || body.lastContactedAt !== undefined) {
+      const rawContacted = body.last_contacted_at !== undefined ? body.last_contacted_at : body.lastContactedAt;
+      updates.last_contacted_at = rawContacted;
+    }
+
+    // Reject attempts to modify protected immutable fields
+    if (body.email !== undefined || body.created_at !== undefined || body.source !== undefined) {
       return {
         statusCode: 400,
         headers: corsHeaders,
         body: JSON.stringify({
           success: false,
-          message: `Invalid status. Allowed values: ${VALID_STATUSES.join(', ')}`
+          message: 'Modification of core client lead identity fields (email, created_at, source) is disallowed.'
+        })
+      };
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          success: false,
+          message: 'No valid CRM fields provided for update.'
         })
       };
     }
 
     try {
-      const updated = await updateLeadStatus(leadId, matchedStatus);
+      const updated = await updateLeadCrm(leadId, updates);
       if (!updated) {
         return {
           statusCode: 404,
@@ -257,18 +383,18 @@ exports.handler = async (event, context) => {
         headers: corsHeaders,
         body: JSON.stringify({
           success: true,
-          message: `Lead status updated to ${matchedStatus}`,
+          message: 'Lead CRM details updated successfully.',
           lead: sanitizeLeadForExport(updated)
         })
       };
     } catch (err) {
-      console.error('[Admin Leads API] Error updating lead:', err.message);
+      console.error('[Admin Leads API] Error updating CRM fields:', err.message);
       return {
         statusCode: 500,
         headers: corsHeaders,
         body: JSON.stringify({
           success: false,
-          message: 'Failed to update lead status in database.'
+          message: 'Failed to update lead CRM details in database.'
         })
       };
     }

@@ -21,12 +21,17 @@ CREATE TABLE IF NOT EXISTS public.leads (
     description TEXT,
     source TEXT DEFAULT 'website',
     status TEXT DEFAULT 'New',
+    priority TEXT DEFAULT 'Normal',
+    internal_notes TEXT,
+    next_follow_up DATE,
+    last_contacted_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     ip_hash TEXT,
     user_agent TEXT,
     legacy_id TEXT,
-    CONSTRAINT status_check CHECK (status IN ('New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'))
+    CONSTRAINT status_check CHECK (status IN ('New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost')),
+    CONSTRAINT priority_check CHECK (priority IN ('Low', 'Normal', 'High', 'Urgent'))
 );
 
 -- 3. Add High-Performance B-Tree Indexes
@@ -94,3 +99,38 @@ REVOKE ALL ON public.admin_users FROM authenticated;
 GRANT ALL ON public.admin_users TO service_role;
 
 COMMENT ON TABLE public.admin_users IS 'Authorized administrators with permission to access the leads dashboard';
+
+-- ============================================================================
+-- 8. STEP 4 CRM Upgrade Migration (public.leads)
+-- ============================================================================
+ALTER TABLE public.leads
+ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'Normal';
+
+ALTER TABLE public.leads
+ADD COLUMN IF NOT EXISTS internal_notes TEXT;
+
+ALTER TABLE public.leads
+ADD COLUMN IF NOT EXISTS next_follow_up DATE;
+
+ALTER TABLE public.leads
+ADD COLUMN IF NOT EXISTS last_contacted_at TIMESTAMPTZ;
+
+-- Add validation check constraint for priority
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'leads_priority_check'
+    ) THEN
+        ALTER TABLE public.leads
+        ADD CONSTRAINT leads_priority_check CHECK (priority IN ('Low', 'Normal', 'High', 'Urgent'));
+    END IF;
+END $$;
+
+-- Ensure existing leads receive priority = 'Normal'
+UPDATE public.leads SET priority = 'Normal' WHERE priority IS NULL;
+
+-- High-performance indexes for CRM pipeline queries
+CREATE INDEX IF NOT EXISTS idx_leads_priority ON public.leads(priority);
+CREATE INDEX IF NOT EXISTS idx_leads_next_follow_up ON public.leads(next_follow_up);
+CREATE INDEX IF NOT EXISTS idx_leads_last_contacted_at ON public.leads(last_contacted_at);
+

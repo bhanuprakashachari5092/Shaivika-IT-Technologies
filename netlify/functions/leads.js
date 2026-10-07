@@ -283,6 +283,7 @@ exports.handler = async (event, context) => {
     description: finalDescription,
     source: 'website',
     status: 'New',
+    priority: 'Normal',
     ip_hash: hashIp(clientIp),
     user_agent: (event.headers['user-agent'] || '').substring(0, 200) || null
   };
